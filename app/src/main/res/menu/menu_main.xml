@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.app.infideap.readcontact.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_search"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_search_white_24dp"
+        android:title="@string/action_search"
+        app:showAsAction="always" />
 </menu>

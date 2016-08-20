@@ -19,6 +19,7 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
+
         <android.support.design.widget.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
@@ -26,6 +27,27 @@
             app:tabGravity="fill"
             app:tabMaxWidth="0dp"
             app:tabMode="fixed" />
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_search"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#fff"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            <EditText
+                android:textColorHint="#666"
+                android:hint="@string/searchwithdot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </android.support.v7.widget.Toolbar>
+
+
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />

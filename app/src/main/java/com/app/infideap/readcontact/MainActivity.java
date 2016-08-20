@@ -19,6 +19,7 @@ public class MainActivity extends BaseActivity implements
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Fragment fragment;
+    private Toolbar searchToolBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,9 @@ public class MainActivity extends BaseActivity implements
             }
         });
 
+        searchToolBar = (Toolbar) findViewById(R.id.toolbar_search);
+        searchToolBar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        searchToolBar.setVisibility(View.GONE);
         initTabLayout();
         initViewPager();
     }
@@ -79,6 +83,8 @@ public class MainActivity extends BaseActivity implements
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+                tabLayout.setVisibility(View.VISIBLE);
+                searchToolBar.setVisibility(View.GONE);
             }
 
             @Override
@@ -108,7 +114,10 @@ public class MainActivity extends BaseActivity implements
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
+            searchToolBar.setVisibility(View.VISIBLE);
+            tabLayout.setVisibility(View.GONE);
+
             return true;
         }
 
@@ -123,12 +132,10 @@ public class MainActivity extends BaseActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constant.PERMISSION_REQUEST && resultCode == RESULT_OK)
-            if (fragment instanceof ContactFragment){
+            if (fragment instanceof ContactFragment) {
                 ContactFragment contactFragment = (ContactFragment) fragment;
                 contactFragment.reload();
-            }
-
-        else
-            super.onActivityResult(requestCode, resultCode, data);
+            } else
+                super.onActivityResult(requestCode, resultCode, data);
     }
 }

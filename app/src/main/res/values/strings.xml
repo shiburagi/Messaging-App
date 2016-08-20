@@ -5,4 +5,6 @@
     <string name="chat">Chat</string>
     <string name="permissionrequestmessage">Need permission.</string>
     <string name="gotit">Got it!</string>
+    <string name="action_search">Search</string>
+    <string name="searchwithdot">Search...</string>
 </resources>
