@@ -37,7 +37,7 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).name);
-        holder.mContentView.setText(mValues.get(position).phoneNumber);
+//        holder.mContentView.setText(mValues.get(position).phoneNumber);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

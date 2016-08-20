@@ -96,6 +96,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/24.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.2.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/de.hdodenhof/circleimageview/2.1.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-safeguard" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-support" />
@@ -119,6 +120,7 @@
     <orderEntry type="library" exported="" name="support-core-ui-24.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-24.2.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-24.2.0" level="project" />
+    <orderEntry type="library" exported="" name="circleimageview-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-24.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-24.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-24.2.0" level="project" />
