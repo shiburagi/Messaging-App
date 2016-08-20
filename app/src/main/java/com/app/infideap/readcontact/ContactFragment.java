@@ -85,7 +85,8 @@ public class ContactFragment extends Fragment {
             if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
                     == PackageManager.PERMISSION_GRANTED) {
                 phones = getContext().getContentResolver()
-                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null,
+                                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
             }
             List<Contact> contacts = new ArrayList<>();
             if (phones != null) {

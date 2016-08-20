@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,16 +17,18 @@ import android.view.View;
 public class MainActivity extends BaseActivity implements
         ContactFragment.OnListFragmentInteractionListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Fragment fragment;
     private Toolbar searchToolBar;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -40,8 +43,30 @@ public class MainActivity extends BaseActivity implements
         searchToolBar = (Toolbar) findViewById(R.id.toolbar_search);
         searchToolBar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         searchToolBar.setVisibility(View.GONE);
+        searchToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideSearch();
+            }
+        });
         initTabLayout();
         initViewPager();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).select();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (searchToolBar.getVisibility() == View.VISIBLE)
+            hideSearch();
+        else
+            super.onBackPressed();
+
     }
 
     private void initViewPager() {
@@ -82,9 +107,9 @@ public class MainActivity extends BaseActivity implements
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                toolbar.setTitle(tab.getText());
                 viewPager.setCurrentItem(tab.getPosition());
-                tabLayout.setVisibility(View.VISIBLE);
-                searchToolBar.setVisibility(View.GONE);
+                hideSearch();
             }
 
             @Override
@@ -94,9 +119,17 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
+                Log.d(TAG, "onTabReselected()");
+                toolbar.setTitle(tab.getText());
             }
         });
 
+
+    }
+
+    private void hideSearch() {
+        tabLayout.setVisibility(View.VISIBLE);
+        searchToolBar.setVisibility(View.GONE);
     }
 
     @Override
