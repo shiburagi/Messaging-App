@@ -21,6 +21,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +37,13 @@ public class BaseActivity extends AppCompatActivity {
     private File photo;
     //    private float IMAGE_SIZE = 720f;
     private String foldername = File.separator + "claim" + File.separator + "image";
+    protected FirebaseDatabase firebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        firebase  = FirebaseDatabase.getInstance();
 
     }
 
@@ -73,7 +78,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public void checkAppPermission() {
         final List<String> permissions = new ArrayList<>();
-        boolean showMessage = readContact(permissions);
+        boolean showMessage = readContact(permissions)||readPhoneState(permissions);
 
 
         if (permissions.size() > 0) {

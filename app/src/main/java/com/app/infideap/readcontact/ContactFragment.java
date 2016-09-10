@@ -1,9 +1,11 @@
 package com.app.infideap.readcontact;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +16,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.app.infideap.readcontact.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +30,8 @@ import java.util.List;
  */
 public class ContactFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
+
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
@@ -77,7 +80,6 @@ public class ContactFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-
             // Code to read contact
             // Begin
             Cursor phones = null;
@@ -85,16 +87,19 @@ public class ContactFragment extends Fragment {
             if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
                     == PackageManager.PERMISSION_GRANTED) {
                 phones = getContext().getContentResolver()
-                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null,
-                                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                        .query(ContactsQuery.CONTENT_URI, ContactsQuery.PROJECTION,
+                                ContactsQuery.SELECTION, null, ContactsQuery.SORT_ORDER);
             }
             List<Contact> contacts = new ArrayList<>();
             if (phones != null) {
                 while (phones.moveToNext()) {
-                    String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    Contact contact = new Contact(name, phoneNumber);
-                    contacts.add(contact);
+
+
+                    Contact contact = getContactDetail(phones);
+
+                    if (contact != null)
+                        contacts.add(contact);
+
                 }
                 phones.close();
             }
@@ -102,6 +107,52 @@ public class ContactFragment extends Fragment {
 
             recyclerView.setAdapter(new ContactRecyclerViewAdapter(contacts, mListener));
         }
+    }
+
+    private Contact getContactDetail(Cursor phone) {
+        Cursor cursor = getContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " +
+                        phone.getString(ContactsQuery.ID) + " AND " +
+                        ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
+                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+                null, null);
+        Contact contact = null;
+        if (cursor != null)
+            if (cursor.moveToFirst()) {
+                String name = phone.getString(
+                        ContactsQuery.DISPLAY_NAME
+                );
+                String phoneNumber = cursor.getString(
+                        cursor.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER
+                        )
+                );
+                int type;
+
+                switch (cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) {
+                    case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                        // do something with the Home number here...
+                        type = R.string.home;
+                        break;
+                    case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                        // do something with the Mobile number here...
+                        type = R.string.mobile;
+                        break;
+                    case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                        // do something with the Work number here...
+                        type = R.string.work;
+                        break;
+                    default:
+                        type = R.string.unknown;
+                        break;
+                }
+
+                contact = new Contact(name, phoneNumber, getResources().getString(type));
+            }
+
+        cursor.close();
+
+        return contact;
     }
 
 
@@ -140,5 +191,82 @@ public class ContactFragment extends Fragment {
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Contact item);
+    }
+
+    public interface ContactsQuery {
+        Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
+
+        // The selection clause for the CursorLoader query. The search criteria defined here
+        // restrict results to contacts that have a display name and are linked to visible groups.
+        // Notice that the search on the string provided by the user is implemented by appending
+        // the search string to CONTENT_FILTER_URI.
+        @SuppressLint("InlinedApi")
+        final static String SELECTION =
+                (Utils.hasHoneycomb() ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME) +
+                        "<>''" + " AND " + ContactsContract.Contacts.IN_VISIBLE_GROUP + "=1";
+
+        // The desired sort order for the returned Cursor. In Android 3.0 and later, the primary
+        // sort key allows for localization. In earlier versions. use the display name as the sort
+        // key.
+        @SuppressLint("InlinedApi")
+        final static String SORT_ORDER =
+                Utils.hasHoneycomb() ? ContactsContract.Contacts.SORT_KEY_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME;
+
+        // The projection for the CursorLoader query. This is a list of columns that the Contacts
+        // Provider should return in the Cursor.
+        @SuppressLint("InlinedApi")
+        final static String[] PROJECTION = {
+
+                // The contact's row id
+                ContactsContract.Contacts._ID,
+
+                // A pointer to the contact that is guaranteed to be more permanent than _ID. Given
+                // a contact's current _ID value and LOOKUP_KEY, the Contacts Provider can generate
+                // a "permanent" contact URI.
+                ContactsContract.Contacts.LOOKUP_KEY,
+
+                // In platform version 3.0 and later, the Contacts table contains
+                // DISPLAY_NAME_PRIMARY, which either contains the contact's displayable name or
+                // some other useful identifier such as an email address. This column isn't
+                // available in earlier versions of Android, so you must use Contacts.DISPLAY_NAME
+                // instead.
+                Utils.hasHoneycomb() ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME,
+                // In Android 3.0 and later, the thumbnail image is pointed to by
+                // PHOTO_THUMBNAIL_URI. In earlier versions, there is no direct pointer; instead,
+                // you generate the pointer from the contact's ID value and constants defined in
+                // android.provider.ContactsContract.Contacts.
+                Utils.hasHoneycomb() ? ContactsContract.Contacts.PHOTO_THUMBNAIL_URI : ContactsContract.Contacts._ID,
+
+                // The sort order column for the returned Cursor, used by the AlphabetIndexer
+                SORT_ORDER,
+        };
+
+        // The query column numbers which map to each value in the projection
+        final static int ID = 0;
+        final static int LOOKUP_KEY = 1;
+        final static int DISPLAY_NAME = 2;
+        final static int PHOTO_THUMBNAIL_DATA = 3;
+        final static int SORT_KEY = 4;
+    }
+
+
+    /**
+     * This interface defines constants used by contact retrieval queries.
+     */
+    public interface ContactDetailQuery {
+        // A unique query ID to distinguish queries being run by the
+        // LoaderManager.
+        final static int QUERY_ID = 1;
+
+        // The query projection (columns to fetch from the provider)
+        @SuppressLint("InlinedApi")
+        final static String[] PROJECTION = {
+                ContactsContract.Contacts._ID,
+                Utils.hasHoneycomb() ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME,
+        };
+
+        // The query column numbers which map to each value in the projection
+        final static int ID = 0;
+        final static int DISPLAY_NAME = 1;
     }
 }

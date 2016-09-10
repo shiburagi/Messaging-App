@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity implements
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
-                    case 0:
+                    case 1:
                         fragment = ContactFragment.newInstance(1);
                         break;
                     default:
@@ -97,8 +97,8 @@ public class MainActivity extends BaseActivity implements
 
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         TabLayout.Tab[] tabs = new TabLayout.Tab[]{
-                tabLayout.newTab().setText(R.string.contact),
-                tabLayout.newTab().setText(R.string.chat)
+                tabLayout.newTab().setText(R.string.chat),
+                tabLayout.newTab().setText(R.string.contact)
         };
 
         for (TabLayout.Tab tab : tabs)
@@ -159,7 +159,9 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onListFragmentInteraction(Contact item) {
-
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra(ChatActivity.CONTACT,item);
+        startActivity(intent);
     }
 
     @Override

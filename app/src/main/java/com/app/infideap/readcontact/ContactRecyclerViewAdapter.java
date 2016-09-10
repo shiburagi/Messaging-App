@@ -37,7 +37,8 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).name);
-//        holder.mContentView.setText(mValues.get(position).phoneNumber);
+        holder.mContentView.setText(mValues.get(position).phoneNumber);
+        holder.typeView.setText(mValues.get(position).type);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +61,7 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
+        public final TextView typeView;
         public Contact mItem;
 
         public ViewHolder(View view) {
@@ -67,6 +69,7 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
+            typeView = (TextView) view.findViewById(R.id.type);
         }
 
         @Override

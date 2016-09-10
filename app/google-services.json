@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "798311058643",
+    "firebase_url": "https://message-infideap.firebaseio.com",
+    "project_id": "message-infideap",
+    "storage_bucket": "message-infideap.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798311058643:android:807caa2958cb5ba5",
+        "android_client_info": {
+          "package_name": "com.app.infideap.readcontact"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "798311058643-e2m24teeulod0f9djfa8n4kqdj40is0h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDm0ii5W7Yke2wSURSm0wPVaSmP9YNEQ58"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

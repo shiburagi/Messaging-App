@@ -7,4 +7,9 @@
     <string name="gotit">Got it!</string>
     <string name="action_search">Search</string>
     <string name="searchwithdot">Search...</string>
+    <string name="home">Home</string>
+    <string name="mobile">Mobile</string>
+    <string name="work">Work</string>
+    <string name="unknown">unknown</string>
+    <string name="title_activity_chat">ChatActivity</string>
 </resources>
