@@ -9,5 +9,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.app.infideap.readcontact.ChatFragment"
+    tools:context=".controller.access.ui.fragment.ChatFragment"
     tools:listitem="@layout/fragment_chat" />

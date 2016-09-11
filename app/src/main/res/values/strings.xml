@@ -12,4 +12,10 @@
     <string name="work">Work</string>
     <string name="unknown">unknown</string>
     <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="yourphonenumber">Please confirm your country code and enter your phone number.</string>
+    <string name="login">Login</string>
+    <string name="noactiveconnection">No active connection.</string>
+    <string name="phonenumbernotvalid">Phone number not valid.</string>
+    <string name="unabletoregister">Unable to register.</string>
 </resources>
