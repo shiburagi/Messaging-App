@@ -17,6 +17,7 @@ import com.app.infideap.readcontact.controller.access.ui.fragment.ChatFragment.O
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.dummy.DummyContent.DummyItem;
 import com.app.infideap.readcontact.entity.Chat;
+import com.app.infideap.readcontact.util.Common;
 
 import java.util.List;
 import java.util.Locale;
@@ -63,8 +64,11 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
                 text.length() - 5, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         styledResultText.setSpan((new ForegroundColorSpan(Color.GRAY)),
                 text.length() - 5, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        holder.mIdView.setText(Html.fromHtml(text));
-//        holder.mContentView.setText(
+        holder.messageView.setText(Html.fromHtml(text));
+
+        holder.dateView.setText(
+                Common.getUserTime(holder.mItem.datetime));
+//        holder.dateView.setText(
 //                String.valueOf(mValues.get(position).datetime)
 //        );
 
@@ -94,20 +98,20 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
 
     public class OwnMessageViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+        public final TextView messageView;
+        public final TextView dateView;
         public Chat mItem;
 
         public OwnMessageViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.textView_message);
-            mContentView = (TextView) view.findViewById(R.id.textView_datetime);
+            messageView = (TextView) view.findViewById(R.id.textView_message);
+            dateView = (TextView) view.findViewById(R.id.textView_datetime);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + dateView.getText() + "'";
         }
     }
 

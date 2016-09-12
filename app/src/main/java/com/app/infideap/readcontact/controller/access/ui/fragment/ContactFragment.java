@@ -9,18 +9,25 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ContactRecyclerViewAdapter;
 import com.app.infideap.readcontact.entity.Contact;
+import com.app.infideap.readcontact.entity.PhoneNumberIndex;
+import com.app.infideap.readcontact.util.Common;
+import com.app.infideap.readcontact.util.Constant;
 import com.app.infideap.readcontact.util.Utils;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +38,11 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ContactFragment extends Fragment {
+public class ContactFragment extends BaseFragment {
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String TAG = ContactFragment.class.getSimpleName();
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
@@ -77,7 +85,7 @@ public class ContactFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            final RecyclerView recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -93,15 +101,82 @@ public class ContactFragment extends Fragment {
                         .query(ContactsQuery.CONTENT_URI, ContactsQuery.PROJECTION,
                                 ContactsQuery.SELECTION, null, ContactsQuery.SORT_ORDER);
             }
-            List<Contact> contacts = new ArrayList<>();
+            final List<Contact> contacts = new ArrayList<>();
             if (phones != null) {
                 while (phones.moveToNext()) {
 
 
-                    Contact contact = getContactDetail(phones);
+                    final Contact contact = getContactDetail(phones);
 
-                    if (contact != null)
-                        contacts.add(contact);
+
+                    if (contact != null) {
+                        if (contact.phoneNumber.length() == 0)
+                            continue;
+                        contact.display = true;
+//                        contacts.add(contact);
+//
+//                        Log.d(TAG, Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0));
+//                        Log.d(TAG, Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9));
+
+
+                        database.getReference(Constant.PHONE_NUMBER)
+                                .orderByChild(Constant.PHONE_NUMBER_INDEX)
+                                .startAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0))
+                                .endAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9))
+                                .limitToFirst(1)
+                                .addChildEventListener(
+                                        new ChildEventListener() {
+                                            @Override
+                                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                                DatabaseReference reference = database.getReference("Logs").child("compare").child("phoneNo")
+                                                        .push();
+                                                PhoneNumberIndex numberIndex = dataSnapshot
+                                                        .getValue(PhoneNumberIndex.class);
+
+                                                boolean equal =
+                                                        numberIndex.phoneNumber.substring(
+                                                                numberIndex.phoneNumber.length()
+                                                                        - contact.phoneNumber.length()
+                                                        ).equals(contact.phoneNumber);
+
+
+
+                                                if (equal) {
+                                                    contact.display = true;
+                                                    contact.phoneNumber = numberIndex
+                                                            .phoneNumber;
+                                                    contacts.add(contact);
+                                                    recyclerView.getAdapter().notifyItemInserted(
+                                                            contacts.size()-1
+                                                    );
+
+                                                    Toast.makeText(getContext(), "Added : " + contact.phoneNumber, Toast.LENGTH_LONG)
+                                                            .show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                                            }
+
+                                            @Override
+                                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                                            }
+
+                                            @Override
+                                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        }
+                                );
+                    }
 
                 }
                 phones.close();
@@ -120,8 +195,9 @@ public class ContactFragment extends Fragment {
                         ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
                 null, null);
         Contact contact = null;
-        if (cursor != null)
+        if (cursor != null) {
             if (cursor.moveToFirst()) {
+                ;
                 String name = phone.getString(
                         ContactsQuery.DISPLAY_NAME
                 );
@@ -130,6 +206,7 @@ public class ContactFragment extends Fragment {
                                 ContactsContract.CommonDataKinds.Phone.NUMBER
                         )
                 );
+
                 int type;
 
                 switch (cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) {
@@ -150,11 +227,12 @@ public class ContactFragment extends Fragment {
                         break;
                 }
 
+
                 contact = new Contact(name, phoneNumber, getResources().getString(type));
             }
 
-        cursor.close();
-
+            cursor.close();
+        }
         return contact;
     }
 

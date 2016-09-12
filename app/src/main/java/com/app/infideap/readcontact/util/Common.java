@@ -197,6 +197,22 @@ public class Common {
         return countryCodeValue;
     }
 
+    public static String getUserTime(long datetime) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(datetime);
+        return getUserTime(calendar);
+    }
+
+    private static String getUserTime(Calendar calendar) {
+        return getUserTime(calendar.getTime());
+    }
+
+    private static String getUserTime(Date time) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        return simpleDateFormat.format(time);
+    }
+
     public static String getDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -209,7 +225,7 @@ public class Common {
     }
 
     public static String getDate(Date calendar) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd HHmmss", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd HHmmss", Locale.getDefault());
 
         return simpleDateFormat.format(calendar);
     }
@@ -226,7 +242,7 @@ public class Common {
     }
 
     public static String getDateForFilename(Date calendar) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmssS", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmssS", Locale.getDefault());
 
         return simpleDateFormat.format(calendar);
     }
@@ -244,7 +260,7 @@ public class Common {
     }
 
     public static String getMonth(Date calendar) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMM", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMM", Locale.getDefault());
 
         return simpleDateFormat.format(calendar);
     }
@@ -270,7 +286,7 @@ public class Common {
     }
 
     public static String getDateString(Date calendar) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
         return simpleDateFormat.format(calendar);
     }
@@ -295,7 +311,7 @@ public class Common {
     }
 
     public static String getDateStringWithInitTime(Date calendar) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00", Locale.getDefault());
 
         return simpleDateFormat.format(calendar);
     }
@@ -407,7 +423,7 @@ public class Common {
     }
 
     public static Date parseDate(String date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
         try {
             return simpleDateFormat.parse(date);
@@ -417,7 +433,7 @@ public class Common {
     }
 
     public static Date parseServerDate(String date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.getDefault());
 
         try {
             return simpleDateFormat.parse(date);
@@ -427,7 +443,7 @@ public class Common {
     }
 
     public static Date parseUserDate(String date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.UK);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
 
         try {
             return simpleDateFormat.parse(date);
@@ -481,7 +497,7 @@ public class Common {
     }
 
     public static String getUserDateString(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.UK);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
 
         return format.format(date);
     }
@@ -495,7 +511,7 @@ public class Common {
     }
 
     public static String getUserDateWithTimeString(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyy  hh:mm:ss a", Locale.UK);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyy  hh:mm:ss a", Locale.getDefault());
 
         return format.format(date);
     }
@@ -808,9 +824,26 @@ public class Common {
     public static Object readAssetAsPOJO(Context context, String fileName, Class<?> c) {
         GsonBuilder gsonBuilder = new GsonBuilder();
 
-        Gson gson=gsonBuilder.create();
+        Gson gson = gsonBuilder.create();
         return gson.fromJson(readAsset(context, fileName), c);
     }
+
+    public static String convertToChatKey(String phoneNumber1, String phoneNumber2) {
+
+        return (phoneNumber1.compareTo(phoneNumber2) < 0 ? phoneNumber1 + phoneNumber2
+                : phoneNumber2 + phoneNumber1).replaceAll("\\+","-");
+    }
+
+    public static String convertToPhoneIndex(String phoneNumber, int value) {
+        StringBuilder phoneIndex = new StringBuilder();
+        for (int i = phoneNumber.length(); i < 20; i++) {
+            phoneIndex.append(value);
+        }
+        phoneIndex.append(phoneNumber);
+
+        return phoneIndex.reverse().toString();
+    }
+
 
     public interface OnUpgradeListener {
         public void onSuccess();

@@ -7,9 +7,10 @@ import java.io.Serializable;
  */
 public class Contact implements Serializable{
     public final String name;
-    public final String phoneNumber;
+    public String phoneNumber;
     public final String type;
     public String status;
+    public boolean display;
 
     public Contact(String name, String phoneNumber, String type) {
         this.name = name;

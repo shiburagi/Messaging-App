@@ -13,10 +13,10 @@ import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.activity.ChatActivity;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ChatRecyclerViewAdapter;
 import com.app.infideap.readcontact.entity.Chat;
-import com.app.infideap.readcontact.entity.ConnectionDetail;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
+import com.app.infideap.stylishwidget.Log;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,6 +35,7 @@ public class ChatFragment extends BaseFragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String TAG = ChatFragment.class.getSimpleName();
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
@@ -81,11 +82,11 @@ public class ChatFragment extends BaseFragment {
             }
 
             List<Chat> chats = new ArrayList<>();
-            String mPhoneNumber = Common.getSimSerialNumber(getContext());
-            chats.add(new Chat("Test", mPhoneNumber, System.currentTimeMillis(), 0));
-            chats.add(new Chat("Test2", mPhoneNumber, System.currentTimeMillis(), 0));
-            chats.add(new Chat("Test2 asdasd asdasd sadasd asdasd", mPhoneNumber, System.currentTimeMillis(), 0));
-            chats.add(new Chat("Test2 asdasd asdasd sadasd asdasd", mPhoneNumber, System.currentTimeMillis(), 1));
+//            String mPhoneNumber = Common.getSimSerialNumber(getContext());
+//            chats.add(new Chat("Test", mPhoneNumber, System.currentTimeMillis(), 0));
+//            chats.add(new Chat("Test2", mPhoneNumber, System.currentTimeMillis(), 0));
+//            chats.add(new Chat("Test2 asdasd asdasd sadasd asdasd", mPhoneNumber, System.currentTimeMillis(), 0));
+//            chats.add(new Chat("Test2 asdasd asdasd sadasd asdasd", mPhoneNumber, System.currentTimeMillis(), 1));
 
             recyclerView.setAdapter(new ChatRecyclerViewAdapter(chats, mListener));
             loadData(chats, recyclerView);
@@ -96,32 +97,56 @@ public class ChatFragment extends BaseFragment {
 
     private void loadData(final List<Chat> chats, final RecyclerView recyclerView) {
 
-        Contact contact = (Contact) getActivity().getIntent()
+        final Contact contact = (Contact) getActivity().getIntent()
                 .getSerializableExtra(ChatActivity.CONTACT);
-        database.getReference(Constant.USER).child(Common.getSimSerialNumber(getContext()))
-                .child(Constant.CONNECTION).child(contact.phoneNumber)
+        final String serialNumber = Common.getSimSerialNumber(getContext());
+        database.getReference(Constant.USER).child(serialNumber)
+                .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        ConnectionDetail connectionDetail =
-                                dataSnapshot.getValue(ConnectionDetail.class);
-                        if (connectionDetail == null)
+                        final String phoneNumber =
+                                dataSnapshot.getValue().toString();
+
+                        Log.d(TAG, "+++ " + serialNumber + phoneNumber);
+
+                        if (phoneNumber == null)
                             return;
-                        database.getReference("chat").child(connectionDetail.chatId)
+
+
+                        database.getReference(Constant.CHAT)
+                                .child(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
                                 .addChildEventListener(new ChildEventListener() {
                                     @Override
                                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//
+                                        Chat chat = dataSnapshot.getValue(Chat.class);
+                                        if (phoneNumber.equals(chat.from))
+                                            chat.type = 0;
+                                        else
+                                            chat.type = 1;
+                                        chats.add(chat);
 
+                                        chat.key = dataSnapshot.getKey();
+                                        recyclerView.getAdapter().notifyItemInserted(chats.size() - 1);
+                                        if (phoneNumber.equals(chat.from))
+                                            recyclerView.smoothScrollToPosition(recyclerView.getHeight());
                                     }
 
                                     @Override
                                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                                        chats.add(dataSnapshot.getValue(Chat.class));
-                                        recyclerView.getAdapter().notifyItemInserted(chats.size() - 1);
+
+
                                     }
 
                                     @Override
                                     public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                        Chat chat = find(chats, dataSnapshot.getKey());
+                                        int index = chats.indexOf(chat);
+                                        chats.remove(chat);
+
+                                        recyclerView.getAdapter()
+                                                .notifyItemRemoved(index);
 
                                     }
 
@@ -142,6 +167,14 @@ public class ChatFragment extends BaseFragment {
 
                     }
                 });
+    }
+
+    private Chat find(List<Chat> chats, String key) {
+        for (Chat chat : chats) {
+            if (chat.key.equals(key))
+                return chat;
+        }
+        return null;
     }
 
 

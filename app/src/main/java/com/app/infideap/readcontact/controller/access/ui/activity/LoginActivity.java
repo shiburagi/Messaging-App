@@ -15,11 +15,17 @@ import android.widget.TextView;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.entity.CountryCode;
+import com.app.infideap.readcontact.entity.PhoneNumberIndex;
+import com.app.infideap.readcontact.entity.User;
 import com.app.infideap.readcontact.util.Common;
+import com.app.infideap.readcontact.util.Constant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -96,8 +102,9 @@ public class LoginActivity extends BaseActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+                            Phonenumber.PhoneNumber numberProto;
                             try {
-                                Phonenumber.PhoneNumber numberProto = phoneUtil.parse(
+                                numberProto = phoneUtil.parse(
                                         phoneNumber,
                                         code.code);
                                 boolean isValid = phoneUtil.isValidNumber(numberProto); // returns true if valid
@@ -112,7 +119,8 @@ public class LoginActivity extends BaseActivity {
                                 Snackbar.make(view, R.string.phonenumbernotvalid, Snackbar.LENGTH_LONG).show();
                                 return;
                             }
-                            register(view, serial, phoneNumber);
+
+                            register(view, serial, phoneUtil, numberProto);
                             return;
                         }
 
@@ -122,6 +130,7 @@ public class LoginActivity extends BaseActivity {
                 });
 
     }
+
 
     private void showProgress() {
         findViewById(R.id.layout_progress).setVisibility(View.VISIBLE);
@@ -134,21 +143,66 @@ public class LoginActivity extends BaseActivity {
         findViewById(R.id.layout_form).setVisibility(View.VISIBLE);
     }
 
-    private void register(final View view, final String serial, final Object phoneNumber) {
-        auth.createUserWithEmailAndPassword(
-                serial.concat("@domain.xyc"), serial).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (!task.isSuccessful()) {
-                    Snackbar.make(view, R.string.unabletoregister, Snackbar.LENGTH_LONG).show();
-                    showForm();
-                    return;
-                }
-                database.getReference("user").child(serial)
-                        .child("phoneNumber").setValue(phoneNumber);
-                login(view);
-            }
-        });
+    private void register(final View view, final String serial, final PhoneNumberUtil phoneUtil, final Phonenumber.PhoneNumber phoneNumber) {
+        database.getReference(Constant.USER)
+                .orderByChild(Constant.PHONE_NUMBER)
+                .equalTo(phoneUtil.format(phoneNumber,
+                        PhoneNumberUtil.PhoneNumberFormat.E164))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                        if (dataSnapshot.getValue() != null) {
+                            Snackbar.make(view, R.string.phonenumberalreadybeenused, Snackbar.LENGTH_LONG)
+                                    .show();
+                            showForm();
+                            return;
+                        }
+                        auth.createUserWithEmailAndPassword(
+                                serial.concat("@domain.xyc"), serial).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (!task.isSuccessful()) {
+                                    Snackbar.make(view, R.string.unabletoregister, Snackbar.LENGTH_LONG).show();
+                                    showForm();
+                                    return;
+                                }
+                                User user = new User(
+                                        phoneUtil.format(phoneNumber,
+                                                PhoneNumberUtil.PhoneNumberFormat.E164),
+                                        String.valueOf(
+                                                phoneNumber.getNationalNumber()
+                                        ),
+                                        String.valueOf(
+                                                phoneNumber.getCountryCode()
+                                        )
+                                );
+                                database.getReference(Constant.USER).child(serial)
+                                        .setValue(user);
+
+                                String phoneIndex = Common.convertToPhoneIndex(
+                                        user.phoneNumber.substring(1), 0);
+                                database.getReference(Constant.PHONE_NUMBER)
+                                        .child(user.phoneNumber)
+                                        .setValue(
+                                                new PhoneNumberIndex(
+                                                        phoneIndex,
+                                                        serial,
+                                                        user.phoneNumber
+                                                )
+                                        );
+                                login(view);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
 }

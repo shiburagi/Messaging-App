@@ -13,7 +13,7 @@
         android:layout_marginRight="@dimen/chat_margin"
         android:layout_marginTop="@dimen/chat_margin"
         android:layout_weight="3"
-        android:gravity="center|right">
+        android:gravity="center|left">
 
         <FrameLayout
             android:layout_marginLeft="-2px"
@@ -33,7 +33,7 @@
                 android:textColor="@color/colorBlack"
                 android:id="@+id/textView_message"
                 android:layout_toLeftOf="@+id/textView_datetime"
-                android:text="asdsadsad asdasd dsfdsf asdasd"
+                android:text="hai"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />

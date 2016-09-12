@@ -53,6 +53,9 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
                 }
             }
         });
+
+        holder.mView.setVisibility(holder.mItem.display ? View.VISIBLE : View.GONE);
+
     }
 
     @Override
