@@ -10,6 +10,7 @@ import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatListFragment.OnListFragmentInteractionListener;
 import com.app.infideap.readcontact.controller.access.ui.fragment.dummy.DummyContent.DummyItem;
 import com.app.infideap.readcontact.entity.ChatMeta;
+import com.app.infideap.readcontact.entity.Contact;
 
 import java.util.List;
 
@@ -20,10 +21,10 @@ import java.util.List;
  */
 public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<ChatMeta> mValues;
+    private final List<Contact> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public ChatListRecyclerViewAdapter(List<ChatMeta> items, OnListFragmentInteractionListener listener) {
+    public ChatListRecyclerViewAdapter(List<Contact> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -62,7 +63,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
-        public ChatMeta mItem;
+        public Contact mItem;
 
         public ViewHolder(View view) {
             super(view);

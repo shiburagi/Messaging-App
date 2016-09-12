@@ -15,12 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.app.infideap.readcontact.R;
+import com.app.infideap.readcontact.controller.access.ui.fragment.ChatListFragment;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ContactFragment;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Constant;
 
 public class MainActivity extends BaseActivity implements
-        ContactFragment.OnListFragmentInteractionListener {
+        ContactFragment.OnListFragmentInteractionListener,
+        ChatListFragment.OnListFragmentInteractionListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private TabLayout tabLayout;
@@ -80,6 +82,9 @@ public class MainActivity extends BaseActivity implements
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
+                    case 0:
+                        fragment = ChatListFragment.newInstance(1);
+                        break;
                     case 1:
                         fragment = ContactFragment.newInstance(1);
                         break;
@@ -165,7 +170,7 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onListFragmentInteraction(Contact item) {
         Intent intent = new Intent(this, ChatActivity.class);
-        intent.putExtra(ChatActivity.CONTACT,item);
+        intent.putExtra(ChatActivity.CONTACT, item);
         startActivity(intent);
     }
 
@@ -178,4 +183,5 @@ public class MainActivity extends BaseActivity implements
             } else
                 super.onActivityResult(requestCode, resultCode, data);
     }
+
 }

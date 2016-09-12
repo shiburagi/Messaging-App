@@ -8,6 +8,9 @@ public class User {
     public String shortPhoneNumber;
     public String countryCode;
 
+    public User(){
+
+    }
     public User(String phoneNumber, String shortPhoneNumber, String countryCode) {
         this.phoneNumber = phoneNumber;
         this.shortPhoneNumber = shortPhoneNumber;

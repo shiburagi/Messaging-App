@@ -79,7 +79,7 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    public void checkAppPermission() {
+    public boolean checkAppPermission() {
         final List<String> permissions = new ArrayList<>();
         boolean showMessage = readContact(permissions) || readPhoneState(permissions)
                 || getAccount(permissions);
@@ -106,6 +106,7 @@ public class BaseActivity extends AppCompatActivity {
                         Constant.PERMISSION_REQUEST);
         }
 
+        return permissions.size() > 0;
     }
 
     private boolean writeExternalStorage(List<String> permissions) {

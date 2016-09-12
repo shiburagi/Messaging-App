@@ -86,8 +86,22 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        login(findViewById(R.id.button_login));
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        if(checkAppPermission())
+    }
+
+    @Override
+    public boolean checkAppPermission() {
+        boolean b = super.checkAppPermission();
+        if (!b)
+            login(findViewById(R.id.button_login));
+
+        return b;
     }
 
     private void login(final View view) {
@@ -179,6 +193,7 @@ public class LoginActivity extends BaseActivity {
                                         )
                                 );
                                 database.getReference(Constant.USER).child(serial)
+                                        .child(Constant.INFORMATION)
                                         .setValue(user);
 
                                 String phoneIndex = Common.convertToPhoneIndex(
@@ -205,4 +220,20 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == Constant.PERMISSION_REQUEST) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                // The user picked a contact.
+                // The Intent's data Uri identifies which contact was selected.
+
+                // Do something with the contact here (bigger example below)
+                login(findViewById(R.id.button_login));
+            }else{
+                finish();
+            }
+        }
+    }
 }

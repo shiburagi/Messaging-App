@@ -15,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ContactRecyclerViewAdapter;
@@ -113,11 +112,6 @@ public class ContactFragment extends BaseFragment {
                         if (contact.phoneNumber.length() == 0)
                             continue;
                         contact.display = true;
-//                        contacts.add(contact);
-//
-//                        Log.d(TAG, Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0));
-//                        Log.d(TAG, Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9));
-
 
                         database.getReference(Constant.PHONE_NUMBER)
                                 .orderByChild(Constant.PHONE_NUMBER_INDEX)
@@ -149,9 +143,6 @@ public class ContactFragment extends BaseFragment {
                                                     recyclerView.getAdapter().notifyItemInserted(
                                                             contacts.size() - 1
                                                     );
-
-                                                    Toast.makeText(getContext(), "Added : " + contact.phoneNumber, Toast.LENGTH_LONG)
-                                                            .show();
                                                 }
                                             }
 

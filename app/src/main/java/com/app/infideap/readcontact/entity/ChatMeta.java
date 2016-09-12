@@ -1,5 +1,6 @@
 package com.app.infideap.readcontact.entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,12 +9,16 @@ import java.util.List;
  */
 public class ChatMeta {
     public long lastUpdate;
-    public List<String> phoneNumber;
+    public List<String> serials;
     public String lastMessage;
 
-    public ChatMeta(String message, long millis, String... phoneNumber) {
+    public ChatMeta() {
+        serials = new ArrayList<>();
+    }
+
+    public ChatMeta(String message, long millis, String... serials) {
         lastMessage = message;
         lastUpdate = millis;
-        this.phoneNumber = Arrays.asList(phoneNumber);
+        this.serials = Arrays.asList(serials);
     }
 }

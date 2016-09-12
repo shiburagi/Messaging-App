@@ -100,7 +100,7 @@ public class ChatActivity extends BaseActivity implements
                         reference.child(Constant.META).setValue(new ChatMeta(
                                 message,
                                 millis,
-                                phoneNumber, contact.phoneNumber
+                                serial, contact.serial
                         ));
 
                         database.getReference(Constant.USER).child(serial)

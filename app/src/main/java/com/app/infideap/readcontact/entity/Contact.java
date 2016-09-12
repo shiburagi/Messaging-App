@@ -6,16 +6,22 @@ import java.io.Serializable;
  * Created by Shiburagi on 20/08/2016.
  */
 public class Contact implements Serializable{
-    public final String name;
+    public String name;
     public String phoneNumber;
-    public final String type;
+    public String type;
     public String status;
     public boolean display;
     public String serial;
+    public String lastMessage;
 
     public Contact(String name, String phoneNumber, String type) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.type = type;
+    }
+
+    public Contact() {
+
+
     }
 }

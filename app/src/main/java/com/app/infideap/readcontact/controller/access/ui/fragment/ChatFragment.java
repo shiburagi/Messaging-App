@@ -101,6 +101,7 @@ public class ChatFragment extends BaseFragment {
                 .getSerializableExtra(ChatActivity.CONTACT);
         final String serialNumber = Common.getSimSerialNumber(getContext());
         database.getReference(Constant.USER).child(serialNumber)
+                .child(Constant.INFORMATION)
                 .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

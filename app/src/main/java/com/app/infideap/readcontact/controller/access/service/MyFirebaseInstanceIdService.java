@@ -41,6 +41,7 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
     private void sendRegistrationToServer(final String refreshedToken) {
         database.getReference(Constant.USER)
                 .child(Common.getSimSerialNumber(getApplicationContext()))
+                .child(Constant.INFORMATION)
                 .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

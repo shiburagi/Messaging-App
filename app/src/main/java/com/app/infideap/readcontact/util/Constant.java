@@ -19,4 +19,5 @@ public class Constant {
     public static final String MESSAGES = "messages";
     public static final String META = "meta";
     public static final String LAST_UPDATED = "lastUpdated";
+    public static final String INFORMATION = "information";
 }
