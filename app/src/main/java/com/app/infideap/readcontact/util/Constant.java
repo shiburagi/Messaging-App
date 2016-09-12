@@ -16,4 +16,7 @@ public class Constant {
     public static final String INSTANCE_ID = "instanceId";
     public static final String CHAT = "chat";
     public static final String PHONE_NUMBER_INDEX = "phoneIndex";
+    public static final String MESSAGES = "messages";
+    public static final String META = "meta";
+    public static final String LAST_UPDATED = "lastUpdated";
 }

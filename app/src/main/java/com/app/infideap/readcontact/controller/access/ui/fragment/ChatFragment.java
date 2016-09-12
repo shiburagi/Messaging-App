@@ -116,6 +116,7 @@ public class ChatFragment extends BaseFragment {
 
                         database.getReference(Constant.CHAT)
                                 .child(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
+                                .child(Constant.MESSAGES)
                                 .addChildEventListener(new ChildEventListener() {
                                     @Override
                                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {

@@ -11,6 +11,7 @@ public class Contact implements Serializable{
     public final String type;
     public String status;
     public boolean display;
+    public String serial;
 
     public Contact(String name, String phoneNumber, String type) {
         this.name = name;

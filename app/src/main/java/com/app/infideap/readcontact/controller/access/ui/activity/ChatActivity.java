@@ -11,6 +11,7 @@ import android.widget.EditText;
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatFragment;
 import com.app.infideap.readcontact.entity.Chat;
+import com.app.infideap.readcontact.entity.ChatMeta;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 public class ChatActivity extends BaseActivity implements
@@ -67,7 +69,8 @@ public class ChatActivity extends BaseActivity implements
         }
         final Contact contact = (Contact) getIntent()
                 .getSerializableExtra(ChatActivity.CONTACT);
-        database.getReference(Constant.USER).child(Common.getSimSerialNumber(this))
+        final String serial=Common.getSimSerialNumber(this);
+        database.getReference(Constant.USER).child(serial)
                 .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -77,12 +80,16 @@ public class ChatActivity extends BaseActivity implements
                         if (phoneNumber == null)
                             return;
 
+                        String key =Common.convertToChatKey(phoneNumber, contact.phoneNumber);
+                        DatabaseReference reference = database.getReference(Constant.CHAT)
+                                .child(key);
 
-                        database.getReference(Constant.CHAT)
-                                .child(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
+                        long millis = System.currentTimeMillis();
+                        reference
+                                .child(Constant.MESSAGES)
                                 .push()
                                 .setValue(
-                                        new Chat(message, phoneNumber, System.currentTimeMillis())
+                                        new Chat(message, phoneNumber, millis)
                                 ).addOnCompleteListener(
                                 new OnCompleteListener<Void>() {
                                     @Override
@@ -90,6 +97,25 @@ public class ChatActivity extends BaseActivity implements
                                         messageEditText.setText(null);
                                     }
                                 });
+                        reference.child(Constant.META).setValue(new ChatMeta(
+                                message,
+                                millis,
+                                phoneNumber, contact.phoneNumber
+                        ));
+
+                        database.getReference(Constant.USER).child(serial)
+                                .child(Constant.MESSAGES)
+                                .child(key)
+                                .child(Constant.LAST_UPDATED).setValue(millis);
+
+
+                        database.getReference(Constant.USER)
+                                .child(contact.serial)
+                                .child(Constant.MESSAGES)
+                                .child(key)
+                                .child(Constant.LAST_UPDATED).setValue(millis);
+
+
                     }
 
                     @Override

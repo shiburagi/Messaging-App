@@ -140,14 +140,14 @@ public class ContactFragment extends BaseFragment {
                                                         ).equals(contact.phoneNumber);
 
 
-
                                                 if (equal) {
                                                     contact.display = true;
                                                     contact.phoneNumber = numberIndex
                                                             .phoneNumber;
+                                                    contact.serial = numberIndex.serial;
                                                     contacts.add(contact);
                                                     recyclerView.getAdapter().notifyItemInserted(
-                                                            contacts.size()-1
+                                                            contacts.size() - 1
                                                     );
 
                                                     Toast.makeText(getContext(), "Added : " + contact.phoneNumber, Toast.LENGTH_LONG)
