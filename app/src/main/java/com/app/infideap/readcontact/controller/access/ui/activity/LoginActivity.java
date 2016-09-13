@@ -228,7 +228,6 @@ public class LoginActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 // The user picked a contact.
                 // The Intent's data Uri identifies which contact was selected.
-
                 // Do something with the contact here (bigger example below)
                 login(findViewById(R.id.button_login));
             }else{

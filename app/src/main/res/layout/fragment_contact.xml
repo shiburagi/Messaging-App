@@ -28,7 +28,7 @@
 
             <android.support.v4.widget.Space
                 android:layout_width="wrap_content"
-                android:layout_height="20dp" />
+                android:layout_height="15dp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -36,26 +36,31 @@
 
                 <TextView
                     android:id="@+id/id"
-                    android:layout_toLeftOf="@+id/type"
                     android:layout_width="match_parent"
-                    android:textStyle="bold"
                     android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/type"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="#000"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                    android:textStyle="bold" />
+
                 <TextView
-                    android:layout_alignParentRight="true"
                     android:id="@+id/type"
-                    android:textAllCaps="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textSize="12sp" />
 
             </RelativeLayout>
 
+            <android.support.v4.widget.Space
+                android:layout_width="wrap_content"
+                android:layout_height="5dp" />
             <TextView
                 android:id="@+id/content"
                 android:layout_width="wrap_content"

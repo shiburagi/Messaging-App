@@ -71,12 +71,13 @@ public class ChatActivity extends BaseActivity implements
                 .getSerializableExtra(ChatActivity.CONTACT);
         final String serial=Common.getSimSerialNumber(this);
         database.getReference(Constant.USER).child(serial)
+                .child(Constant.INFORMATION)
                 .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String phoneNumber =
-                                dataSnapshot.getValue().toString();
+                                dataSnapshot.getValue(String.class);
                         if (phoneNumber == null)
                             return;
 

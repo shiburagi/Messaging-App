@@ -19,4 +19,6 @@
     <string name="phonenumbernotvalid">Phone number not valid.</string>
     <string name="unabletoregister">Unable to register.</string>
     <string name="phonenumberalreadybeenused">Phone number already been used.</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="today">Today</string>
 </resources>

@@ -26,7 +26,7 @@ import java.util.Locale;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerViewAdapter.OwnMessageViewHolder> {
+public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<Chat> mValues;
     private final OnListFragmentInteractionListener mListener;
@@ -37,12 +37,18 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
     }
 
     @Override
-    public OwnMessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view;
-        if(viewType==0)
+        if (viewType == 2) {
             view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_chat, parent, false);
+                    .inflate(R.layout.fragment_chat_date_label, parent, false);
+            return new DateLabelViewHolder(view);
+
+        }
+        else if (viewType == 0)
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_chat_right, parent, false);
         else
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_chat_left, parent, false);
@@ -50,13 +56,25 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
     }
 
     @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+        if(holder instanceof  DateLabelViewHolder){
+            onBindViewHolder((DateLabelViewHolder) holder, position);
+        }else{
+            onBindViewHolder((OwnMessageViewHolder) holder, position);
+        }
+
+    }
+    public void onBindViewHolder(final DateLabelViewHolder holder, int position) {
+        holder.mItem = mValues.get(position);
+        holder.labelView.setText(holder.mItem.message);
+    }
     public void onBindViewHolder(final OwnMessageViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
 //        String text = mValues.get(position).message.concat("\t\t00:00");
         String text = String.format(
                 Locale.getDefault(),
                 "%s &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
-                ,holder.mItem.message
+                , holder.mItem.message
         );
         final SpannableString styledResultText = new SpannableString(text);
         styledResultText.setSpan((new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE)),
@@ -111,6 +129,25 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
         @Override
         public String toString() {
             return super.toString() + " '" + dateView.getText() + "'";
+        }
+    }
+
+
+
+    public class DateLabelViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView labelView;
+        public Chat mItem;
+
+        public DateLabelViewHolder(View view) {
+            super(view);
+            mView = view;
+            labelView = (TextView) view.findViewById(R.id.textView_label);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString();
         }
     }
 

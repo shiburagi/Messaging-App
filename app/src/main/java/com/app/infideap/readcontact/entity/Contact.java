@@ -13,6 +13,7 @@ public class Contact implements Serializable{
     public boolean display;
     public String serial;
     public String lastMessage;
+    public long lastUpdated;
 
     public Contact(String name, String phoneNumber, String type) {
         this.name = name;

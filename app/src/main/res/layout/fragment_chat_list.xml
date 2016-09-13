@@ -10,4 +10,4 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".controller.access.ui.fragment.ChatFragment"
-    tools:listitem="@layout/fragment_chat" />
+    tools:listitem="@layout/fragment_chat_right" />

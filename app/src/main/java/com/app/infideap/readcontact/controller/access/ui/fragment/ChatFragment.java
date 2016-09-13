@@ -119,10 +119,25 @@ public class ChatFragment extends BaseFragment {
                                 .child(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
                                 .child(Constant.MESSAGES)
                                 .addChildEventListener(new ChildEventListener() {
+                                    String date = null;
+
                                     @Override
                                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 //
                                         Chat chat = dataSnapshot.getValue(Chat.class);
+
+                                        String chatDate = Common.getDateString(chat.datetime);
+                                        if (!chatDate.equals(date)) {
+                                            Chat labelChat = new Chat(
+                                                    Common.getUserFriendlyDateForChat(
+                                                            getContext(),
+                                                            chat.datetime
+                                                    ), 2
+                                            );
+                                            chats.add(labelChat);
+
+                                            date = chatDate;
+                                        }
                                         if (phoneNumber.equals(chat.from))
                                             chat.type = 0;
                                         else

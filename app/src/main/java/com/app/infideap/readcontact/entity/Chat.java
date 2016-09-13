@@ -26,4 +26,9 @@ public class Chat {
         this.message = message;
         this.from = phoneNumber;
     }
+
+    public Chat(String label, int type) {
+        this.message = label;
+        this.type = type;
+    }
 }

@@ -266,26 +266,26 @@ public class Common {
     }
 
 
-    public static String getDateString() {
+    public static String getDateAndTimeString() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
-        return getDateString(calendar);
+        return getDateAndTimeString(calendar);
     }
 
-    public static String getDateString(long millis) {
+    public static String getDateAndTimeString(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        return getDateString(calendar);
+        return getDateAndTimeString(calendar);
     }
 
 
-    public static String getDateString(Calendar calendar) {
+    public static String getDateAndTimeString(Calendar calendar) {
 
-        return getDateString(calendar.getTime());
+        return getDateAndTimeString(calendar.getTime());
     }
 
-    public static String getDateString(Date calendar) {
+    public static String getDateAndTimeString(Date calendar) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
         return simpleDateFormat.format(calendar);
@@ -422,8 +422,18 @@ public class Common {
         return true;
     }
 
-    public static Date parseDate(String date) {
+    public static Date parseDateTime(String date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
+        try {
+            return simpleDateFormat.parse(date);
+        } catch (ParseException e) {
+            return new Date();
+        }
+    }
+
+    public static Date parseDate(String date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
 
         try {
             return simpleDateFormat.parse(date);
@@ -480,9 +490,99 @@ public class Common {
         }
     }
 
+    public static String getDateString(String dateString) {
+
+        Date date = parseDateTime(dateString);
+
+        return getDateString(date);
+
+    }
+
+    public static String getDateString() {
+
+        Date date = Calendar.getInstance().getTime();
+
+        return getDateString(date);
+
+    }
+
+    public static String getDateString(long millis) {
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(millis);
+        return getDateString(date.getTime());
+
+    }
+
+    public static String getDateString(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+
+        return format.format(date);
+    }
+
+    public static String getChatDateString(String dateString) {
+
+        Date date = parseDateTime(dateString);
+
+        return getChatDateString(date);
+
+    }
+
+    public static String getChatDateString() {
+
+        Date date = Calendar.getInstance().getTime();
+
+        return getChatDateString(date);
+
+    }
+
+    public static String getChatDateString(long millis) {
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(millis);
+        return getChatDateString(date.getTime());
+
+    }
+
+    public static String getChatDateString(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("MMMMMMM dd, yyyy", Locale.getDefault());
+
+        return format.format(date);
+    }
+
+    public static String getSimpleDateString(String dateString) {
+
+        Date date = parseDateTime(dateString);
+
+        return getSimpleDateString(date);
+
+    }
+
+    public static String getSimpleDateString() {
+
+        Date date = Calendar.getInstance().getTime();
+
+        return getSimpleDateString(date);
+
+    }
+
+    public static String getSimpleDateString(long millis) {
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(millis);
+        return getSimpleDateString(date.getTime());
+
+    }
+
+    public static String getSimpleDateString(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+
+        return format.format(date);
+    }
+
     public static String getUserDateString(String dateString) {
 
-        Date date = parseDate(dateString);
+        Date date = parseDateTime(dateString);
 
         return getUserDateString(date);
 
@@ -496,6 +596,14 @@ public class Common {
 
     }
 
+    public static String getUserDateString(long millis) {
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(millis);
+        return getUserDateString(date.getTime());
+
+    }
+
     public static String getUserDateString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
 
@@ -504,7 +612,7 @@ public class Common {
 
     public static String getUserDateWithTimeString(String dateString) {
 
-        Date date = parseDate(dateString);
+        Date date = parseDateTime(dateString);
 
         return getUserDateWithTimeString(date);
 
@@ -831,7 +939,7 @@ public class Common {
     public static String convertToChatKey(String phoneNumber1, String phoneNumber2) {
 
         return (phoneNumber1.compareTo(phoneNumber2) < 0 ? phoneNumber1 + phoneNumber2
-                : phoneNumber2 + phoneNumber1).replaceAll("\\+","-");
+                : phoneNumber2 + phoneNumber1).replaceAll("\\+", "-");
     }
 
     public static String convertToPhoneIndex(String phoneNumber, int value) {
@@ -843,6 +951,49 @@ public class Common {
 
         return phoneIndex.reverse().toString();
     }
+
+    public static String getUserFriendlyDate(Context context, long millis) {
+
+        millis = getMillisForDateOnly(millis);
+        long currentMillis = getMillisForDateOnly(System.currentTimeMillis());
+
+        long diff = currentMillis - millis;
+        int days = (int) Math.floor(diff / (1000 * 60 * 60 * 24));
+        if (days == 1)
+            return context.getResources().getString(R.string.yesterday);
+        else {
+            return Common.getSimpleDateString(millis);
+        }
+    }
+
+    public static String getUserFriendlyDateForChat(Context context, long millis) {
+
+        millis = getMillisForDateOnly(millis);
+        long currentMillis = getMillisForDateOnly(System.currentTimeMillis());
+
+        long diff = currentMillis - millis;
+        int days = (int) Math.floor(diff / (1000 * 60 * 60 * 24));
+        if (days == 0)
+            return context.getResources().getString(R.string.today);
+        else if (days == 1)
+            return context.getResources().getString(R.string.yesterday);
+        else {
+            return Common.getChatDateString(millis);
+        }
+    }
+
+    private static long getMillisForDateOnly(long millis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        calendar.set(Calendar.HOUR_OF_DAY,0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND,0);
+
+        return calendar.getTimeInMillis();
+    }
+
+
 
 
     public interface OnUpgradeListener {

@@ -10,9 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
+import com.app.infideap.readcontact.controller.access.ui.adapter.ChatListRecyclerViewAdapter;
 import com.app.infideap.readcontact.entity.ChatMeta;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.entity.User;
@@ -111,7 +111,8 @@ public class ChatListFragment extends BaseFragment {
                                                 for (String _serial : chatMeta.serials) {
                                                     if (!serial.equals(_serial)) {
 
-                                                        getContact(_serial, chatMeta.lastMessage, contacts, recyclerView);
+                                                        getContact(_serial, chatMeta.lastMessage, chatMeta.lastUpdate,
+                                                                contacts, recyclerView);
                                                         break;
                                                     }
                                                 }
@@ -149,7 +150,8 @@ public class ChatListFragment extends BaseFragment {
                 });
     }
 
-    private void getContact(final String serial, final String lastMessage, final List<Contact> contacts, final RecyclerView recyclerView) {
+    private void getContact(final String serial, final String lastMessage, final long lastUpdated,
+                            final List<Contact> contacts, final RecyclerView recyclerView) {
 
         database.getReference(Constant.USER).child(serial)
                 .child(Constant.INFORMATION)
@@ -157,8 +159,6 @@ public class ChatListFragment extends BaseFragment {
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Toast.makeText(getContext(), "Change : " + serial + dataSnapshot.getValue(), Toast.LENGTH_LONG)
-                                        .show();
                                 if (dataSnapshot.getValue() == null)
                                     return;
 
@@ -171,6 +171,8 @@ public class ChatListFragment extends BaseFragment {
 
                                 contact.phoneNumber = user.phoneNumber;
                                 contact.lastMessage = lastMessage;
+                                contact.lastUpdated = lastUpdated;
+                                contact.serial = serial;
 
                                 contacts.add(contact);
                                 recyclerView.getAdapter().notifyItemInserted(contacts.size() - 1);
