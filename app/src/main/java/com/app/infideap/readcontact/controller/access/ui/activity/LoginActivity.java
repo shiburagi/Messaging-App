@@ -138,7 +138,8 @@ public class LoginActivity extends BaseActivity {
                             return;
                         }
 
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        if (!MainActivity.isRunnning)
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     }
                 });
@@ -230,7 +231,7 @@ public class LoginActivity extends BaseActivity {
                 // The Intent's data Uri identifies which contact was selected.
                 // Do something with the contact here (bigger example below)
                 login(findViewById(R.id.button_login));
-            }else{
+            } else {
                 finish();
             }
         }

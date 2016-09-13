@@ -1,7 +1,9 @@
 package com.app.infideap.readcontact.controller.access.ui.activity;
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -13,29 +15,39 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.AdapterView;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatListFragment;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ContactFragment;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Constant;
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ObjectAnimator;
 
 public class MainActivity extends BaseActivity implements
         ContactFragment.OnListFragmentInteractionListener,
         ChatListFragment.OnListFragmentInteractionListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static boolean isRunnning;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Fragment fragment;
     private Toolbar searchToolBar;
     private Toolbar toolbar;
+    private AppBarLayout appBar;
+    private AppBarLayout searchAppBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        appBar = (AppBarLayout) findViewById(R.id.appBar);
+        searchAppBar = (AppBarLayout) findViewById(R.id.appBar_search);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -48,17 +60,34 @@ public class MainActivity extends BaseActivity implements
         });
 
         searchToolBar = (Toolbar) findViewById(R.id.toolbar_search);
-        searchToolBar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        searchToolBar.setVisibility(View.GONE);
-        searchToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideSearch();
-            }
-        });
+        if (searchToolBar != null) {
+            searchToolBar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+            searchToolBar.setVisibility(View.GONE);
+            searchToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    hideSearch();
+                }
+            });
+        }
         initTabLayout();
         initViewPager();
 
+        if (isRunnning)
+            finish();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isRunnning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isRunnning = false;
     }
 
     @Override
@@ -138,8 +167,63 @@ public class MainActivity extends BaseActivity implements
     }
 
     private void hideSearch() {
-        tabLayout.setVisibility(View.VISIBLE);
-        searchToolBar.setVisibility(View.GONE);
+        appBar.setVisibility(View.VISIBLE);
+//        searchToolBar.setVisibility(View.GONE);
+//        appBar.setExpanded(true);
+
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(
+                ObjectAnimator.ofFloat(appBar, "translationY", 0),
+                ObjectAnimator.ofFloat(viewPager, "translationY", 0)
+        );
+        set.setDuration(200).start();
+
+
+        // get the center for the clipping circle
+
+        int cx = toolbar.getWidth()-toolbar.getHeight()/2;
+        int cy = (toolbar.getTop() + toolbar.getBottom())/2;
+
+        // get the final radius for the clipping circle
+        int dx = Math.max(cx, toolbar.getWidth() - cx);
+        int dy = Math.max(cy, toolbar.getHeight() - cy);
+        float finalRadius = (float) Math.hypot(dx, dy);
+
+        Animator animator;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            animator = ViewAnimationUtils
+                    .createCircularReveal(searchToolBar, cx, cy, finalRadius, 0);
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            animator.setDuration(200);
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+//                    searchToolBar.setAlpha(0);
+                    toolbar.setAlpha(1f);
+                    searchToolBar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+
+            animator.start();
+
+
+        } else {
+            searchToolBar.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -158,8 +242,49 @@ public class MainActivity extends BaseActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
+
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+            toolbar.setAlpha(0);
+
+            AnimatorSet set = new AnimatorSet();
+            set.playTogether(
+                    ObjectAnimator.ofFloat(appBar, "translationY", -tabLayout.getHeight()),
+                    ObjectAnimator.ofFloat(viewPager, "translationY", -tabLayout.getHeight())
+            );
+            set.setDuration(200).start();
+
+            toolbar.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    appBar.setVisibility(View.GONE);
+                }
+            }, 200);
+
+
             searchToolBar.setVisibility(View.VISIBLE);
-            tabLayout.setVisibility(View.GONE);
+
+            // get the center for the clipping circle
+
+            int cx = toolbar.getWidth()-toolbar.getHeight()/2;
+            int cy = (toolbar.getTop() + toolbar.getBottom())/2;
+
+            // get the final radius for the clipping circle
+            int dx = Math.max(cx, toolbar.getWidth() - cx);
+            int dy = Math.max(cy, toolbar.getHeight() - cy);
+            float finalRadius = (float) Math.hypot(dx, dy);
+
+            Animator animator;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                animator = ViewAnimationUtils
+                        .createCircularReveal(searchToolBar, cx, cy, 0, finalRadius);
+                animator.setInterpolator(new AccelerateDecelerateInterpolator());
+                animator.setDuration(200);
+                animator.start();
+
+            } else
+                searchToolBar.setVisibility(View.VISIBLE);
+
 
             return true;
         }
