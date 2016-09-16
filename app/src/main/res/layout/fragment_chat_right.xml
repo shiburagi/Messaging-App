@@ -40,16 +40,28 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-            <com.app.infideap.stylishwidget.view.ATextView
-                android:layout_marginRight="@dimen/chat_margin"
-                android:id="@+id/textView_datetime"
-                android:layout_width="wrap_content"
-                android:gravity="right"
+            <LinearLayout
                 android:layout_gravity="bottom|right"
-                android:layout_alignParentRight="true"
-                android:text="00:00"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:layout_marginRight="@dimen/chat_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.app.infideap.stylishwidget.view.ATextView
+                    android:id="@+id/textView_datetime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:gravity="right"
+                    android:text="00:00"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_sent_gray_24dp" />
+            </LinearLayout>
         </FrameLayout>
 
         <ImageView

@@ -7,6 +7,7 @@
     android:fitsSystemWindows="true"
     tools:context=".controller.access.ui.activity.MainActivity">
 
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
@@ -33,6 +34,14 @@
 
     </android.support.design.widget.AppBarLayout>
 
+
+    <include layout="@layout/content_main" />
+
+    <!--<io.codetail.widget.RevealFrameLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@android:drawable/dialog_holo_light_frame">-->
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar_search"
         android:layout_width="match_parent"
@@ -55,8 +64,7 @@
 
 
     </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/content_main" />
+    <!--</io.codetail.widget.RevealFrameLayout>-->
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

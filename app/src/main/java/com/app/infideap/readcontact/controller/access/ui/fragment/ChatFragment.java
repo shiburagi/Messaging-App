@@ -16,10 +16,11 @@ import com.app.infideap.readcontact.entity.Chat;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
-import com.app.infideap.stylishwidget.Log;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -100,25 +101,42 @@ public class ChatFragment extends BaseFragment {
         final Contact contact = (Contact) getActivity().getIntent()
                 .getSerializableExtra(ChatActivity.CONTACT);
         final String serialNumber = Common.getSimSerialNumber(getContext());
-        database.getReference(Constant.USER).child(serialNumber)
+        DatabaseReference reference = database.getReference(Constant.USER).child(serialNumber)
                 .child(Constant.INFORMATION)
-                .child(Constant.PHONE_NUMBER)
+                .child(Constant.PHONE_NUMBER);
+//                .orderByChild(Constant.DATETIME)
+//                .limitToFirst(20);
+//                .limitToLast(20);
+
+        reference
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         final String phoneNumber =
-                                dataSnapshot.getValue().toString();
+                                dataSnapshot.getValue(String.class);
 
-                        Log.d(TAG, "+++ " + serialNumber + phoneNumber);
+//                        Log.d(TAG, "+++ " + serialNumber + phoneNumber);
 
                         if (phoneNumber == null)
                             return;
 
-
-                        database.getReference(Constant.CHAT)
+                        Query query = database.getReference(Constant.CHAT)
                                 .child(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
                                 .child(Constant.MESSAGES)
-                                .addChildEventListener(new ChildEventListener() {
+                                .limitToLast(20);
+                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                recyclerView.smoothScrollToPosition(recyclerView.getHeight());
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        query.addChildEventListener(new ChildEventListener() {
                                     String date = null;
 
                                     @Override
@@ -130,7 +148,7 @@ public class ChatFragment extends BaseFragment {
                                         if (!chatDate.equals(date)) {
                                             Chat labelChat = new Chat(
                                                     Common.getUserFriendlyDateForChat(
-                                                            getContext(),
+                                                            recyclerView.getContext(),
                                                             chat.datetime
                                                     ), 2
                                             );

@@ -16,38 +16,51 @@
         android:gravity="center|left">
 
         <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="-2px"
-            android:paddingTop="@dimen/chat_margin"
+            android:layout_toRightOf="@+id/imageView_direction"
+            android:background="@drawable/layerlist_round_rectangle_white_with_shadow"
+            android:gravity="bottom"
+            android:orientation="horizontal"
             android:paddingBottom="@dimen/chat_margin"
             android:paddingLeft="@dimen/chat_margin"
             android:paddingRight="@dimen/chat_margin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:layout_toRightOf="@+id/imageView_direction"
-            android:background="@drawable/layerlist_round_rectangle_white_with_shadow"
-            android:orientation="horizontal">
+            android:paddingTop="@dimen/chat_margin">
 
             <com.app.infideap.stylishwidget.view.ATextView
-                android:layout_marginLeft="@dimen/chat_margin"
-                android:textColor="@color/colorBlack"
                 android:id="@+id/textView_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/chat_margin"
                 android:layout_toLeftOf="@+id/textView_datetime"
-                android:text="hai"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:text="hai               "
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorBlack" />
 
-            <com.app.infideap.stylishwidget.view.ATextView
-                android:layout_marginRight="@dimen/chat_margin"
-                android:id="@+id/textView_datetime"
-                android:layout_width="wrap_content"
-                android:gravity="right"
+            <LinearLayout
                 android:layout_gravity="bottom|right"
-                android:layout_alignParentRight="true"
-                android:text="00:00"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:layout_marginRight="@dimen/chat_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.app.infideap.stylishwidget.view.ATextView
+                    android:id="@+id/textView_datetime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:gravity="right"
+                    android:text="00:00"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <ImageView
+                    android:visibility="gone"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_sent_gray_24dp" />
+            </LinearLayout>
         </FrameLayout>
 
         <ImageView
@@ -56,8 +69,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_direction_left_white_24dp" />
     </RelativeLayout>
+
     <android.support.v4.widget.Space
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 </LinearLayout>

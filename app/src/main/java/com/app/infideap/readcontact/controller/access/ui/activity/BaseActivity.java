@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
+import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
@@ -46,8 +47,14 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if (database==null){
+//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//        }
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
+
+
+
     }
 
     @Override
@@ -55,14 +62,17 @@ public class BaseActivity extends AppCompatActivity {
         super.onResume();
         checkAppPermission();
 
-//        if (checkSystemWritePermission()) {
-//            Configuration config = new Configuration();
-//            config.fontScale = PreferencesManager.getInstance().getFontSize();
-//            getResources().getConfiguration().setTo(config);
-//
-//            Settings.System.putFloat(getBaseContext().getContentResolver(),
-//                    Settings.System.FONT_SCALE, PreferencesManager.getInstance().getFontSize());
-//        }
+        database.getReference(Constant.USER).child(Common.getSimSerialNumber(this))
+                .child(Constant.STATUS).child(Constant.ACTIVE).setValue(1);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        database.getReference(Constant.USER).child(Common.getSimSerialNumber(this))
+                .child(Constant.STATUS).child(Constant.ACTIVE).setValue(0);
+        database.getReference(Constant.USER).child(Common.getSimSerialNumber(this))
+                .child(Constant.STATUS).child(Constant.LAST_SEEN).setValue(System.currentTimeMillis());
     }
 
     @Override

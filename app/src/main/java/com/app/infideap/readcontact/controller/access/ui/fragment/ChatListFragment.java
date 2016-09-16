@@ -104,6 +104,7 @@ public class ChatListFragment extends BaseFragment {
                                         new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
+
                                                 if (dataSnapshot.getValue() == null)
                                                     return;
 
@@ -190,7 +191,10 @@ public class ChatListFragment extends BaseFragment {
 
     private Contact contactDetail(String shortPhoneNumber) {
         Cursor cursor = getContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                ContactsContract.CommonDataKinds.Phone.NUMBER + " like ? AND " +
+                "replace(replace(replace(replace(" +
+                        ContactsContract.CommonDataKinds.Phone.NUMBER +
+                        ", '(', ''), ')',''), ' ', ''), '-', '') " +
+                        " like ? AND " +
                         ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
                         ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
                 new String[]{
@@ -199,7 +203,6 @@ public class ChatListFragment extends BaseFragment {
         Contact contact = null;
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                ;
                 String name = cursor.getString(
                         cursor.getColumnIndex(
                                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME

@@ -62,7 +62,8 @@ public class MainActivity extends BaseActivity implements
         searchToolBar = (Toolbar) findViewById(R.id.toolbar_search);
         if (searchToolBar != null) {
             searchToolBar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-            searchToolBar.setVisibility(View.GONE);
+//            searchToolBar.setVisibility(View.GONE);
+            searchAppBar.setVisibility(View.GONE);
             searchToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -72,6 +73,16 @@ public class MainActivity extends BaseActivity implements
         }
         initTabLayout();
         initViewPager();
+
+//        appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+//            @Override
+//            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+//                if(verticalOffset >= appBarLayout.getHeight()){
+//                    appBarLayout.setExpanded(true);
+//                }else
+//                    appBarLayout.setExpanded(false);
+//            }
+//        });
 
         if (isRunnning)
             finish();
@@ -98,7 +109,7 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onBackPressed() {
-        if (searchToolBar.getVisibility() == View.VISIBLE)
+        if (searchAppBar.getVisibility() == View.VISIBLE)
             hideSearch();
         else
             super.onBackPressed();
@@ -181,8 +192,8 @@ public class MainActivity extends BaseActivity implements
 
         // get the center for the clipping circle
 
-        int cx = toolbar.getWidth()-toolbar.getHeight()/2;
-        int cy = (toolbar.getTop() + toolbar.getBottom())/2;
+        int cx = toolbar.getWidth() - toolbar.getHeight() / 2;
+        int cy = (toolbar.getTop() + toolbar.getBottom()) / 2;
 
         // get the final radius for the clipping circle
         int dx = Math.max(cx, toolbar.getWidth() - cx);
@@ -192,7 +203,7 @@ public class MainActivity extends BaseActivity implements
         Animator animator;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             animator = ViewAnimationUtils
-                    .createCircularReveal(searchToolBar, cx, cy, finalRadius, 0);
+                    .createCircularReveal(searchAppBar, cx, cy, finalRadius, 0);
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.setDuration(200);
             animator.addListener(new Animator.AnimatorListener() {
@@ -204,7 +215,7 @@ public class MainActivity extends BaseActivity implements
                 public void onAnimationEnd(Animator animator) {
 //                    searchToolBar.setAlpha(0);
                     toolbar.setAlpha(1f);
-                    searchToolBar.setVisibility(View.GONE);
+                    searchAppBar.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -222,7 +233,7 @@ public class MainActivity extends BaseActivity implements
 
 
         } else {
-            searchToolBar.setVisibility(View.GONE);
+            searchAppBar.setVisibility(View.GONE);
         }
     }
 
@@ -262,12 +273,12 @@ public class MainActivity extends BaseActivity implements
             }, 200);
 
 
-            searchToolBar.setVisibility(View.VISIBLE);
+            searchAppBar.setVisibility(View.VISIBLE);
 
             // get the center for the clipping circle
 
-            int cx = toolbar.getWidth()-toolbar.getHeight()/2;
-            int cy = (toolbar.getTop() + toolbar.getBottom())/2;
+            int cx = toolbar.getWidth() - toolbar.getHeight() / 2;
+            int cy = (toolbar.getTop() + toolbar.getBottom()) / 2;
 
             // get the final radius for the clipping circle
             int dx = Math.max(cx, toolbar.getWidth() - cx);
@@ -277,13 +288,13 @@ public class MainActivity extends BaseActivity implements
             Animator animator;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 animator = ViewAnimationUtils
-                        .createCircularReveal(searchToolBar, cx, cy, 0, finalRadius);
+                        .createCircularReveal(searchAppBar, cx, cy, 0, finalRadius);
                 animator.setInterpolator(new AccelerateDecelerateInterpolator());
                 animator.setDuration(200);
                 animator.start();
 
             } else
-                searchToolBar.setVisibility(View.VISIBLE);
+                searchAppBar.setVisibility(View.VISIBLE);
 
 
             return true;

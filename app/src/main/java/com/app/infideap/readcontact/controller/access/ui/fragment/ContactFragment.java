@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ContactRecyclerViewAdapter;
@@ -113,6 +114,7 @@ public class ContactFragment extends BaseFragment {
                             continue;
                         contact.display = true;
 
+
                         database.getReference(Constant.PHONE_NUMBER)
                                 .orderByChild(Constant.PHONE_NUMBER_INDEX)
                                 .startAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0))
@@ -196,7 +198,7 @@ public class ContactFragment extends BaseFragment {
                         cursor.getColumnIndex(
                                 ContactsContract.CommonDataKinds.Phone.NUMBER
                         )
-                );
+                ).replaceAll("[\\D]","");
 
                 int type;
 

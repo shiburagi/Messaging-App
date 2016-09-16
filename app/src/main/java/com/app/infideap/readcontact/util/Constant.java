@@ -20,4 +20,9 @@ public class Constant {
     public static final String META = "meta";
     public static final String LAST_UPDATED = "lastUpdated";
     public static final String INFORMATION = "information";
+
+    public static final String STATUS = "status";
+    public static final String LAST_SEEN = "lastSeen";
+    public static final String ACTIVE = "active";
+    public static final String DATETIME = "datetime";
 }

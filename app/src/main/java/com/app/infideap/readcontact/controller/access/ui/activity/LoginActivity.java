@@ -24,7 +24,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -41,7 +40,6 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -56,6 +54,10 @@ public class LoginActivity extends BaseActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        if(auth.getCurrentUser()!=null){
+            redirect();
+        }
 
         countrySpinner = (Spinner) findViewById(R.id.spinner_country);
         countryCodeTextView = (TextView) findViewById(R.id.textView_country_code);
@@ -138,12 +140,16 @@ public class LoginActivity extends BaseActivity {
                             return;
                         }
 
-                        if (!MainActivity.isRunnning)
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        redirect();
                         finish();
                     }
                 });
 
+    }
+
+    private void redirect() {
+        if (!MainActivity.isRunnning)
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
     }
 
 

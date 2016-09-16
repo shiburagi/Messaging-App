@@ -37,6 +37,10 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:9.4.0'
     compile 'com.android.support:cardview-v7:24.2.0'
     compile 'com.google.code.gson:gson:2.7'
+
+    compile('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
+        transitive = true;
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'
