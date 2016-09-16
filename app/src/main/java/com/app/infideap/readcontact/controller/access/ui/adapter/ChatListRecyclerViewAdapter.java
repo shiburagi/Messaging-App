@@ -40,7 +40,18 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).name);
-        holder.mContentView.setText(mValues.get(position).lastMessage);
+
+        String lastMessage = holder.mItem.lastMessage;
+        String[] lastMessages = lastMessage.split("\n");
+        if (lastMessages.length > 0) {
+            if (lastMessages[0].length() > 25)
+                lastMessage = lastMessages[0].substring(0, 25).concat("...");
+            else
+                lastMessage = lastMessages[0].concat("...");
+        } else if (lastMessage.length() > 25) {
+            lastMessage = lastMessage.substring(0, 25).concat("...");
+        }
+        holder.mContentView.setText(lastMessage);
         String date = Common.getDateString(holder.mItem.lastUpdated);
         String todayDate = Common.getDateString(System.currentTimeMillis());
 
