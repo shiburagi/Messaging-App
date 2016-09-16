@@ -101,12 +101,8 @@ public class ChatFragment extends BaseFragment {
         final Contact contact = (Contact) getActivity().getIntent()
                 .getSerializableExtra(ChatActivity.CONTACT);
         final String serialNumber = Common.getSimSerialNumber(getContext());
-        DatabaseReference reference = database.getReference(Constant.USER).child(serialNumber)
-                .child(Constant.INFORMATION)
+        DatabaseReference reference = ref.getUser().information(serialNumber)
                 .child(Constant.PHONE_NUMBER);
-//                .orderByChild(Constant.DATETIME)
-//                .limitToFirst(20);
-//                .limitToLast(20);
 
         reference
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -120,9 +116,8 @@ public class ChatFragment extends BaseFragment {
                         if (phoneNumber == null)
                             return;
 
-                        Query query = database.getReference(Constant.CHAT)
-                                .child(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
-                                .child(Constant.MESSAGES)
+                        Query query = ref.getChat()
+                                .message(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
                                 .limitToLast(20);
                         query.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -137,64 +132,70 @@ public class ChatFragment extends BaseFragment {
                         });
 
                         query.addChildEventListener(new ChildEventListener() {
-                                    String date = null;
+                            String date = null;
 
-                                    @Override
-                                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 //
-                                        Chat chat = dataSnapshot.getValue(Chat.class);
+                                Chat chat = dataSnapshot.getValue(Chat.class);
 
-                                        String chatDate = Common.getDateString(chat.datetime);
-                                        if (!chatDate.equals(date)) {
-                                            Chat labelChat = new Chat(
-                                                    Common.getUserFriendlyDateForChat(
-                                                            recyclerView.getContext(),
-                                                            chat.datetime
-                                                    ), 2
-                                            );
-                                            chats.add(labelChat);
+                                String chatDate = Common.getDateString(chat.datetime);
+                                if (!chatDate.equals(date)) {
+                                    Chat labelChat = new Chat(
+                                            Common.getUserFriendlyDateForChat(
+                                                    recyclerView.getContext(),
+                                                    chat.datetime
+                                            ), 2
+                                    );
+                                    chats.add(labelChat);
 
-                                            date = chatDate;
-                                        }
-                                        if (phoneNumber.equals(chat.from))
-                                            chat.type = 0;
-                                        else
-                                            chat.type = 1;
-                                        chats.add(chat);
+                                    date = chatDate;
+                                }
+                                if (phoneNumber.equals(chat.from))
+                                    chat.type = 0;
+                                else
+                                    chat.type = 1;
+                                chat.key = dataSnapshot.getKey();
 
-                                        chat.key = dataSnapshot.getKey();
-                                        recyclerView.getAdapter().notifyItemInserted(chats.size() - 1);
-                                        if (phoneNumber.equals(chat.from))
-                                            recyclerView.smoothScrollToPosition(recyclerView.getHeight());
-                                    }
-
-                                    @Override
-                                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                                if (dataSnapshot.getKey() == null) return;
+                                chats.add(chat);
 
 
-                                    }
+                                recyclerView.getAdapter().notifyItemInserted(chats.size() - 1);
+                                if (phoneNumber.equals(chat.from))
+                                    recyclerView.smoothScrollToPosition(recyclerView.getHeight());
+                            }
 
-                                    @Override
-                                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-                                        Chat chat = find(chats, dataSnapshot.getKey());
-                                        int index = chats.indexOf(chat);
-                                        chats.remove(chat);
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                                        recyclerView.getAdapter()
-                                                .notifyItemRemoved(index);
 
-                                    }
+                            }
 
-                                    @Override
-                                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.getValue() == null)
+                                    return;
+                                Chat chat = find(chats, dataSnapshot.getValue(Chat.class));
+                                int index = chats.indexOf(chat);
+                                chats.remove(chat);
 
-                                    }
+                                if (index >= 0)
+                                    recyclerView.getAdapter()
+                                            .notifyItemRemoved(index);
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                            }
 
-                                    }
-                                });
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                     }
 
                     @Override
@@ -205,9 +206,26 @@ public class ChatFragment extends BaseFragment {
     }
 
     private Chat find(List<Chat> chats, String key) {
-        for (Chat chat : chats) {
-            if (chat.key.equals(key))
-                return chat;
+        try {
+            for (Chat chat : chats) {
+                if (chat.key.equals(key))
+                    return chat;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Chat find(List<Chat> chats, Chat _chat) {
+        try {
+            for (Chat chat : chats) {
+                if (chat.datetime == _chat.datetime)
+                    if (chat.from.equals(_chat.from))
+                        return chat;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

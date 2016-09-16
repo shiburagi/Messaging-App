@@ -24,8 +24,8 @@ import android.widget.Toast;
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
+import com.app.infideap.readcontact.util.References;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,8 +41,9 @@ public class BaseActivity extends AppCompatActivity {
     private File photo;
     //    private float IMAGE_SIZE = 720f;
     private String foldername = File.separator + "claim" + File.separator + "image";
-    protected FirebaseDatabase database;
+    //    protected FirebaseDatabase database;
     protected FirebaseAuth auth;
+    protected References ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +51,9 @@ public class BaseActivity extends AppCompatActivity {
 //        if (database==null){
 //            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 //        }
-        database = FirebaseDatabase.getInstance();
+//        database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
-
+        ref = References.getInstance();
 
 
     }
@@ -62,17 +63,17 @@ public class BaseActivity extends AppCompatActivity {
         super.onResume();
         checkAppPermission();
 
-        database.getReference(Constant.USER).child(Common.getSimSerialNumber(this))
-                .child(Constant.STATUS).child(Constant.ACTIVE).setValue(1);
+        if (auth.getCurrentUser() != null)
+            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.ACTIVE).setValue(1);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        database.getReference(Constant.USER).child(Common.getSimSerialNumber(this))
-                .child(Constant.STATUS).child(Constant.ACTIVE).setValue(0);
-        database.getReference(Constant.USER).child(Common.getSimSerialNumber(this))
-                .child(Constant.STATUS).child(Constant.LAST_SEEN).setValue(System.currentTimeMillis());
+        if (auth.getCurrentUser() != null) {
+            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.ACTIVE).setValue(0);
+            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.LAST_SEEN).setValue(System.currentTimeMillis());
+        }
     }
 
     @Override

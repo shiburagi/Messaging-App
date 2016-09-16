@@ -92,14 +92,12 @@ public class ChatListFragment extends BaseFragment {
 
     private void loadData(final List<Contact> contacts, final RecyclerView recyclerView) {
         final String serial = Common.getSimSerialNumber(getContext());
-        database.getReference(Constant.USER).child(serial)
-                .child(Constant.MESSAGES)
+        ref.getUser().message(serial)
                 .orderByChild(Constant.LAST_UPDATED)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        database.getReference(Constant.CHAT).child(dataSnapshot.getKey())
-                                .child(Constant.META)
+                        ref.getChat().meta(dataSnapshot.getKey())
                                 .addListenerForSingleValueEvent(
                                         new ValueEventListener() {
                                             @Override
@@ -154,8 +152,7 @@ public class ChatListFragment extends BaseFragment {
     private void getContact(final String serial, final String lastMessage, final long lastUpdated,
                             final List<Contact> contacts, final RecyclerView recyclerView) {
 
-        database.getReference(Constant.USER).child(serial)
-                .child(Constant.INFORMATION)
+        ref.getUser().information(serial)
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override

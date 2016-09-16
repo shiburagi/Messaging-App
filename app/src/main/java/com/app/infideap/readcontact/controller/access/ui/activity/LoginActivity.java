@@ -165,7 +165,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void register(final View view, final String serial, final PhoneNumberUtil phoneUtil, final Phonenumber.PhoneNumber phoneNumber) {
-        database.getReference(Constant.USER)
+        ref.getUser().getReference()
                 .orderByChild(Constant.PHONE_NUMBER)
                 .equalTo(phoneUtil.format(phoneNumber,
                         PhoneNumberUtil.PhoneNumberFormat.E164))
@@ -199,14 +199,12 @@ public class LoginActivity extends BaseActivity {
                                                 phoneNumber.getCountryCode()
                                         )
                                 );
-                                database.getReference(Constant.USER).child(serial)
-                                        .child(Constant.INFORMATION)
+                                ref.getUser().information(serial)
                                         .setValue(user);
 
                                 String phoneIndex = Common.convertToPhoneIndex(
                                         user.phoneNumber.substring(1), 0);
-                                database.getReference(Constant.PHONE_NUMBER)
-                                        .child(user.phoneNumber)
+                                ref.getPhoneNumber().getReference(user.phoneNumber)
                                         .setValue(
                                                 new PhoneNumberIndex(
                                                         phoneIndex,

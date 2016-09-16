@@ -2,7 +2,7 @@ package com.app.infideap.readcontact.controller.access;
 
 import android.app.Application;
 
-import com.google.firebase.database.DatabaseReference;
+import com.app.infideap.readcontact.util.References;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
@@ -10,14 +10,16 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 public class BaseApplication extends Application{
 
-    private DatabaseReference database;
+    private FirebaseDatabase database;
 
     @Override
     public void onCreate() {
         super.onCreate();
         if(database==null)
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        database = FirebaseDatabase.getInstance().getReference();
+        database = FirebaseDatabase.getInstance();
+        References.init(this, database);
 
     }
+
 }

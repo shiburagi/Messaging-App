@@ -25,4 +25,5 @@ public class Constant {
     public static final String LAST_SEEN = "lastSeen";
     public static final String ACTIVE = "active";
     public static final String DATETIME = "datetime";
+    public static final String ACTION = "action";
 }

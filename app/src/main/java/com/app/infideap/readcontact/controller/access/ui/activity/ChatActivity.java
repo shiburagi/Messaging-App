@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -51,8 +53,8 @@ public class ChatActivity extends BaseActivity implements
             getSupportActionBar().setTitle("");
         }
 
-         titleToolbarTextView = (TextView) toolbar.findViewById(R.id.textView_toolbar_title);
-         descToolbarTextView = (TextView) toolbar.findViewById(R.id.textView_toolbar_description);
+        titleToolbarTextView = (TextView) toolbar.findViewById(R.id.textView_toolbar_title);
+        descToolbarTextView = (TextView) toolbar.findViewById(R.id.textView_toolbar_description);
 
         descToolbarTextView.setText(null);
         if (contact == null)
@@ -71,32 +73,55 @@ public class ChatActivity extends BaseActivity implements
             }
         });
 
+
         messageEditText = (EditText) findViewById(R.id.editText_message);
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                DatabaseReference reference = ref.getUser()
+                        .status(Common.getSimSerialNumber(ChatActivity.this))
+                        .child(Constant.ACTION);
+                if (charSequence.length() > 0) {
+                    reference.setValue(1);
+                } else {
+                    reference.setValue(0);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
     }
 
     private void partnerStatus() {
-        database.getReference(Constant.USER).child(contact.serial)
-                .child(Constant.STATUS)
+        ref.getUser().status(contact.serial)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
 //                        Toast.makeText(ChatActivity.this, "Change", Toast.LENGTH_LONG).show();
-                        if(dataSnapshot.getValue()==null)
+                        if (dataSnapshot.getValue() == null)
                             return;
 
                         UserStatus userStatus = dataSnapshot.getValue(UserStatus.class);
-                        if (userStatus.active ==1){
+                        if (userStatus.active == 1) {
                             descToolbarTextView.setText(R.string.online);
-                        }else{
+                        } else {
                             descToolbarTextView.setText(
                                     String.format(
                                             Locale.getDefault(),
                                             "%s %s at %s",
                                             getResources().getString(R.string.lastseen),
                                             Common.getUserFriendlyDateForChat(
-                                                    ChatActivity.this,userStatus.lastSeen
+                                                    ChatActivity.this, userStatus.lastSeen
                                             ).toLowerCase(),
                                             Common.getUserTime(userStatus.lastSeen)
                                     )
@@ -126,8 +151,7 @@ public class ChatActivity extends BaseActivity implements
         final Contact contact = (Contact) getIntent()
                 .getSerializableExtra(ChatActivity.CONTACT);
         final String serial = Common.getSimSerialNumber(this);
-        database.getReference(Constant.USER).child(serial)
-                .child(Constant.INFORMATION)
+        ref.getUser().information(serial)
                 .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -138,12 +162,9 @@ public class ChatActivity extends BaseActivity implements
                             return;
 
                         String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
-                        DatabaseReference reference = database.getReference(Constant.CHAT)
-                                .child(key);
 
                         long millis = System.currentTimeMillis();
-                        reference
-                                .child(Constant.MESSAGES)
+                        ref.getChat().message(key)
                                 .push()
                                 .setValue(
                                         new Chat(message, phoneNumber, millis)
@@ -154,21 +175,19 @@ public class ChatActivity extends BaseActivity implements
                                         messageEditText.setText(null);
                                     }
                                 });
-                        reference.child(Constant.META).setValue(new ChatMeta(
+                        ref.getChat().meta(key)
+                                .setValue(new ChatMeta(
                                 message,
                                 millis,
                                 serial, contact.serial
                         ));
 
-                        database.getReference(Constant.USER).child(serial)
-                                .child(Constant.MESSAGES)
+                        ref.getUser().message(serial)
                                 .child(key)
                                 .child(Constant.LAST_UPDATED).setValue(millis);
 
 
-                        database.getReference(Constant.USER)
-                                .child(contact.serial)
-                                .child(Constant.MESSAGES)
+                        ref.getUser().message(serial)
                                 .child(key)
                                 .child(Constant.LAST_UPDATED).setValue(millis);
 

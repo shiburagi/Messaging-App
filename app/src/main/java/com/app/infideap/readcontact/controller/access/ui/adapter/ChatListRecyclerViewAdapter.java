@@ -43,7 +43,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
 
         String lastMessage = holder.mItem.lastMessage;
         String[] lastMessages = lastMessage.split("\n");
-        if (lastMessages.length > 0) {
+        if (lastMessages.length > 1) {
             if (lastMessages[0].length() > 25)
                 lastMessage = lastMessages[0].substring(0, 25).concat("...");
             else

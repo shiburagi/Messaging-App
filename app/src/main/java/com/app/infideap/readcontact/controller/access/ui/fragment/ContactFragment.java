@@ -15,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ContactRecyclerViewAdapter;
@@ -27,7 +26,6 @@ import com.app.infideap.readcontact.util.Utils;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +113,7 @@ public class ContactFragment extends BaseFragment {
                         contact.display = true;
 
 
-                        database.getReference(Constant.PHONE_NUMBER)
+                        ref.getPhoneNumber().getReference()
                                 .orderByChild(Constant.PHONE_NUMBER_INDEX)
                                 .startAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0))
                                 .endAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9))
@@ -124,8 +122,7 @@ public class ContactFragment extends BaseFragment {
                                         new ChildEventListener() {
                                             @Override
                                             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                                DatabaseReference reference = database.getReference("Logs").child("compare").child("phoneNo")
-                                                        .push();
+
                                                 PhoneNumberIndex numberIndex = dataSnapshot
                                                         .getValue(PhoneNumberIndex.class);
 
@@ -198,7 +195,7 @@ public class ContactFragment extends BaseFragment {
                         cursor.getColumnIndex(
                                 ContactsContract.CommonDataKinds.Phone.NUMBER
                         )
-                ).replaceAll("[\\D]","");
+                ).replaceAll("[\\D]", "");
 
                 int type;
 
