@@ -72,6 +72,9 @@ public class References {
         }
 
 
+        public DatabaseReference notification(String serial) {
+            return getReference(serial).child(Constant.NOTIFICATION);
+        }
     }
 
     public class Chat {

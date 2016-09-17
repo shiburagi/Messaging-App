@@ -11,12 +11,15 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatFragment.OnListFragmentInteractionListener;
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.entity.Chat;
 import com.app.infideap.readcontact.util.Common;
+import com.app.infideap.readcontact.util.Constant;
+import com.app.infideap.readcontact.util.References;
 
 import java.util.List;
 import java.util.Locale;
@@ -45,8 +48,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .inflate(R.layout.fragment_chat_date_label, parent, false);
             return new DateLabelViewHolder(view);
 
-        }
-        else if (viewType == 0)
+        } else if (viewType == 0)
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_chat_right, parent, false);
         else
@@ -57,17 +59,19 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        if(holder instanceof  DateLabelViewHolder){
+        if (holder instanceof DateLabelViewHolder) {
             onBindViewHolder((DateLabelViewHolder) holder, position);
-        }else{
+        } else {
             onBindViewHolder((OwnMessageViewHolder) holder, position);
         }
 
     }
+
     public void onBindViewHolder(final DateLabelViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.labelView.setText(holder.mItem.message);
     }
+
     public void onBindViewHolder(final OwnMessageViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
 //        String text = mValues.get(position).message.concat("\t\t00:00");
@@ -100,6 +104,32 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         });
 
+        int resId;
+        switch (holder.mItem.status) {
+            case Constant.MESSAGE_SENT:
+                resId = R.drawable.ic_sent_gray_24dp;
+                break;
+            case Constant.MESSAGE_RECEIVE:
+                resId = R.drawable.ic_receive_gray_24dp;
+                break;
+            case Constant.MESSAGE_READ:
+                resId = R.drawable.ic_read_cyan_24dp;
+                break;
+
+            default:
+                resId = R.drawable.ic_schedule_gray_24dp;
+
+        }
+
+        holder.statusView.setImageResource(resId);
+
+        if(holder.mItem.type==1&& holder.mItem.status!=Constant.MESSAGE_READ){
+            References.getInstance().getChat().message(holder.mItem.chatKey)
+                    .child(holder.mItem.key)
+                    .child(Constant.STATUS)
+                    .setValue(Constant.MESSAGE_READ);
+        }
+
     }
 
     @Override
@@ -117,6 +147,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         public final View mView;
         public final TextView messageView;
         public final TextView dateView;
+        private final ImageView statusView;
         public Chat mItem;
 
         public OwnMessageViewHolder(View view) {
@@ -124,6 +155,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             mView = view;
             messageView = (TextView) view.findViewById(R.id.textView_message);
             dateView = (TextView) view.findViewById(R.id.textView_datetime);
+            statusView = (ImageView) view.findViewById(R.id.imageView_status);
         }
 
         @Override
@@ -131,7 +163,6 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             return super.toString() + " '" + dateView.getText() + "'";
         }
     }
-
 
 
     public class DateLabelViewHolder extends RecyclerView.ViewHolder {

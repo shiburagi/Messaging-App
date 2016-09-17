@@ -25,6 +25,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -55,7 +56,7 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        if(auth.getCurrentUser()!=null){
+        if (auth.getCurrentUser() != null) {
             redirect();
         }
 
@@ -148,6 +149,17 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void redirect() {
+
+
+        FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
+        String token;
+        if (instanceId.getToken() != null) {
+            token = instanceId.getToken();
+
+            ref.getUser().notification(Common.getSimSerialNumber(this))
+                    .child(Constant.INSTANCE_ID)
+                    .setValue(token);
+        }
         if (!MainActivity.isRunnning)
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
     }

@@ -116,8 +116,9 @@ public class ChatFragment extends BaseFragment {
                         if (phoneNumber == null)
                             return;
 
+                        final String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
                         Query query = ref.getChat()
-                                .message(Common.convertToChatKey(phoneNumber, contact.phoneNumber))
+                                .message(key)
                                 .limitToLast(20);
                         query.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -151,11 +152,13 @@ public class ChatFragment extends BaseFragment {
 
                                     date = chatDate;
                                 }
+
+                                chat.chatKey = key;
                                 if (phoneNumber.equals(chat.from))
                                     chat.type = 0;
                                 else
                                     chat.type = 1;
-                                chat.key = dataSnapshot.getKey();
+                                chat.key = dataSnapshot.getRef().getKey();
 
 //                                if (dataSnapshot.getKey() == null) return;
                                 chats.add(chat);
@@ -168,7 +171,19 @@ public class ChatFragment extends BaseFragment {
 
                             @Override
                             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                if (dataSnapshot.getValue() == null)
+                                    return;
+                                Chat _Chat = dataSnapshot.getValue(Chat.class);
+                                Chat chat = find(chats, _Chat);
+                                if (chat == null)
+                                    return;
 
+                                chat.status = _Chat.status;
+
+                                int index = chats.indexOf(chat);
+                                if (index >= 0)
+                                    recyclerView.getAdapter()
+                                            .notifyItemChanged(index);
 
                             }
 

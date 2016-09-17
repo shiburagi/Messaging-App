@@ -26,4 +26,11 @@ public class Constant {
     public static final String ACTIVE = "active";
     public static final String DATETIME = "datetime";
     public static final String ACTION = "action";
+    public static final String NOTIFICATION = "notification";
+    public static final String PROJECT_API_KEY = "AIzaSyDP_wGYLAgRFuVUZu9SiR7ijBo1OCQzks4";
+    public static final int MESSAGE_SEND = 0;
+    public static final int MESSAGE_SENT = 1;
+    public static final int MESSAGE_RECEIVE = 2;
+    public static final int MESSAGE_READ = 3;
+    public static final String ITEMS = "items";
 }

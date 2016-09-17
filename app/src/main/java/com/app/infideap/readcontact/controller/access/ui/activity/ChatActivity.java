@@ -7,15 +7,20 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatFragment;
 import com.app.infideap.readcontact.entity.Chat;
 import com.app.infideap.readcontact.entity.ChatMeta;
 import com.app.infideap.readcontact.entity.Contact;
+import com.app.infideap.readcontact.entity.Data;
+import com.app.infideap.readcontact.entity.FCMSend;
+import com.app.infideap.readcontact.entity.Notification;
 import com.app.infideap.readcontact.entity.UserStatus;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
@@ -25,6 +30,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.BasicNameValuePair;
+import com.koushikdutta.ion.Ion;
 
 import java.util.Locale;
 
@@ -112,7 +122,10 @@ public class ChatActivity extends BaseActivity implements
                             return;
 
                         UserStatus userStatus = dataSnapshot.getValue(UserStatus.class);
-                        if (userStatus.active == 1) {
+                        if (userStatus.action == 1) {
+                            descToolbarTextView.setText(R.string.typing);
+
+                        } else if (userStatus.active == 1) {
                             descToolbarTextView.setText(R.string.online);
                         } else {
                             descToolbarTextView.setText(
@@ -156,31 +169,39 @@ public class ChatActivity extends BaseActivity implements
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        String phoneNumber =
+                        final String phoneNumber =
                                 dataSnapshot.getValue(String.class);
                         if (phoneNumber == null)
                             return;
 
-                        String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
+                        final String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
+                        FirebaseMessaging.getInstance().subscribeToTopic(key);
 
                         long millis = System.currentTimeMillis();
-                        ref.getChat().message(key)
-                                .push()
-                                .setValue(
-                                        new Chat(message, phoneNumber, millis)
-                                ).addOnCompleteListener(
+                        final DatabaseReference reference = ref.getChat().message(key)
+                                .push();
+
+                        final Chat chat = new Chat(message, phoneNumber, millis, Constant.MESSAGE_SEND);
+
+                        reference.setValue(
+                                chat
+                        ).addOnCompleteListener(
                                 new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        messageEditText.setText(null);
+                                        chat.status = Constant.MESSAGE_SENT;
+                                        reference.setValue(chat);
+                                        pushNotification(key, reference.getKey(), chat);
                                     }
                                 });
+                        messageEditText.setText(null);
+
                         ref.getChat().meta(key)
                                 .setValue(new ChatMeta(
-                                message,
-                                millis,
-                                serial, contact.serial
-                        ));
+                                        message,
+                                        millis,
+                                        serial, contact.serial
+                                ));
 
                         ref.getUser().message(serial)
                                 .child(key)
@@ -191,6 +212,57 @@ public class ChatActivity extends BaseActivity implements
                                 .child(key)
                                 .child(Constant.LAST_UPDATED).setValue(millis);
 
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+    }
+
+    private void pushNotification(final String chatKey, final String key, final Chat chat) {
+        FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
+        if (instanceId.getToken() == null)
+            return;
+
+        ref.getUser().notification(contact.serial).child(Constant.INSTANCE_ID)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() == null)
+                            return;
+
+                        FCMSend fcmSend = new FCMSend();
+                        fcmSend.to = dataSnapshot.getValue(String.class);
+                        fcmSend.data = new Data();
+                        fcmSend.data.key = key;
+                        fcmSend.data.sender = chat.from;
+                        fcmSend.data.message = chat.message;
+                        fcmSend.data.chatKey = chatKey;
+                        fcmSend.notification = new Notification();
+                        fcmSend.notification.body = chat.message;
+                        fcmSend.notification.icon = "";
+                        fcmSend.notification.title = chat.from;
+                        Ion.with(ChatActivity.this).load("https://fcm.googleapis.com/fcm/send")
+                                .setHeader(new BasicNameValuePair("Content-Type", "application/json"))
+                                .setHeader(new BasicNameValuePair("project_id", "798311058643"))
+                                .setHeader(new BasicNameValuePair("Authorization", "key=" + Constant.PROJECT_API_KEY))
+                                .setJsonPojoBody(fcmSend)
+                                .asString().setCallback(new FutureCallback<String>() {
+                            @Override
+                            public void onCompleted(Exception e, String result) {
+                                if (e == null) {
+                                    Toast.makeText(ChatActivity.this, "Sent", Toast.LENGTH_LONG).show();
+                                    Log.d("FCM", result);
+                                } else {
+                                    Toast.makeText(ChatActivity.this, "Not sent", Toast.LENGTH_LONG).show();
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
 
                     }
 

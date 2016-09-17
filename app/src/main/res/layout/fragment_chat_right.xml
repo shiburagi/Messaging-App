@@ -56,10 +56,13 @@
                     android:gravity="right"
                     android:text="00:00"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
+                <android.support.v4.widget.Space
+                    android:layout_width="5dp"
+                    android:layout_height="wrap_content" />
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:id="@+id/imageView_status"
                     android:src="@drawable/ic_sent_gray_24dp" />
             </LinearLayout>
         </FrameLayout>

@@ -84,8 +84,7 @@ public class MainActivity extends BaseActivity implements
 //            }
 //        });
 
-        if (isRunnning)
-            finish();
+//        MyFirebaseMessagingService.inboxStyle = null;
 
     }
 
@@ -93,6 +92,8 @@ public class MainActivity extends BaseActivity implements
     protected void onStart() {
         super.onStart();
         isRunnning = true;
+
+
     }
 
     @Override

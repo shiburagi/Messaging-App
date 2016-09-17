@@ -4,9 +4,9 @@ import android.util.Log;
 
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
+import com.app.infideap.readcontact.util.References;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
@@ -16,13 +16,13 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
  */
 public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
     private static final String TAG = MyFirebaseInstanceIdService.class.getSimpleName();
-    private FirebaseDatabase database;
+    private References database;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        database = FirebaseDatabase.getInstance();
+        database = References.getInstance();
 
     }
 
@@ -39,9 +39,8 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
     }
 
     private void sendRegistrationToServer(final String refreshedToken) {
-        database.getReference(Constant.USER)
-                .child(Common.getSimSerialNumber(getApplicationContext()))
-                .child(Constant.INFORMATION)
+        database.getUser()
+                .information(Common.getSimSerialNumber(getApplicationContext()))
                 .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -59,7 +58,7 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
     }
 
     private void sendRegistrationToServer(String value, String refreshedToken) {
-        database.getReference(Constant.PHONE_NUMBER).child(value)
+        database.getUser().notification(value)
                 .child(Constant.INSTANCE_ID)
                 .setValue(refreshedToken);
     }
