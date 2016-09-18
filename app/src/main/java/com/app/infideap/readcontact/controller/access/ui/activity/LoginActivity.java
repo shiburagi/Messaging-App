@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.entity.CountryCode;
 import com.app.infideap.readcontact.entity.PhoneNumberIndex;
-import com.app.infideap.readcontact.entity.User;
+import com.app.infideap.readcontact.entity.UserInformation;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -201,7 +201,7 @@ public class LoginActivity extends BaseActivity {
                                     showForm();
                                     return;
                                 }
-                                User user = new User(
+                                UserInformation userInformation = new UserInformation(
                                         phoneUtil.format(phoneNumber,
                                                 PhoneNumberUtil.PhoneNumberFormat.E164),
                                         String.valueOf(
@@ -212,16 +212,16 @@ public class LoginActivity extends BaseActivity {
                                         )
                                 );
                                 ref.getUser().information(serial)
-                                        .setValue(user);
+                                        .setValue(userInformation);
 
                                 String phoneIndex = Common.convertToPhoneIndex(
-                                        user.phoneNumber.substring(1), 0);
-                                ref.getPhoneNumber().getReference(user.phoneNumber)
+                                        userInformation.phoneNumber.substring(1), 0);
+                                ref.getPhoneNumber().getReference(userInformation.phoneNumber)
                                         .setValue(
                                                 new PhoneNumberIndex(
                                                         phoneIndex,
                                                         serial,
-                                                        user.phoneNumber
+                                                        userInformation.phoneNumber
                                                 )
                                         );
                                 login(view);

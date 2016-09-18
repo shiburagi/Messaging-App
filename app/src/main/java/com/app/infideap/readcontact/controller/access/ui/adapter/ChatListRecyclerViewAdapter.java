@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.infideap.readcontact.R;
@@ -64,6 +65,17 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
             ));
         }
 
+        if(holder.mItem.unreadCount==0){
+            holder.typeView.setTextColor(holder.typeTextColor);
+            holder.countLayout.setVisibility(View.GONE);
+        }else {
+            int color = holder.typeView.getResources().getColor(R.color.colorEmerland);
+            holder.typeView.setTextColor(color);
+            holder.countView.setText(String.valueOf(holder.mItem.unreadCount));
+            holder.countLayout.setVisibility(View.VISIBLE);
+            holder.countImageView.setColorFilter(color);
+        }
+
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +99,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
         public final TextView mIdView;
         public final TextView mContentView;
         public final TextView typeView;
+        private final TextView countView;
+        private final View countLayout;
+        private final ImageView countImageView;
         public Contact mItem;
+        public int typeTextColor;
 
         public ViewHolder(View view) {
             super(view);
@@ -95,6 +111,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
             typeView = (TextView) view.findViewById(R.id.type);
+            countView = (TextView) view.findViewById(R.id.count);
+            countImageView = (ImageView) view.findViewById(R.id.imageView_count);
+            countLayout = view.findViewById(R.id.layout_count);
+
+            typeTextColor = typeView.getCurrentTextColor();
         }
 
         @Override

@@ -10,12 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.app.infideap.readcontact.R;
-import com.app.infideap.readcontact.controller.access.ui.activity.ChatActivity;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ChatRecyclerViewAdapter;
 import com.app.infideap.readcontact.entity.Chat;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
+import com.app.infideap.stylishwidget.Log;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,11 +35,15 @@ import java.util.List;
 public class ChatFragment extends BaseFragment {
 
     // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String CONTACT = "column-count";
     private static final String TAG = ChatFragment.class.getSimpleName();
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private Contact contact;
+    private RecyclerView recyclerView;
+    private boolean isMax = false;
+    private boolean initialize;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -50,10 +54,10 @@ public class ChatFragment extends BaseFragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ChatFragment newInstance(int columnCount) {
+    public static ChatFragment newInstance(Contact columnCount) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putSerializable(CONTACT, columnCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,7 +67,7 @@ public class ChatFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            contact = (Contact) getArguments().getSerializable(CONTACT);
         }
     }
 
@@ -75,9 +79,10 @@ public class ChatFragment extends BaseFragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+                recyclerView.setLayoutManager(linearLayoutManager);
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
@@ -92,14 +97,35 @@ public class ChatFragment extends BaseFragment {
             recyclerView.setAdapter(new ChatRecyclerViewAdapter(chats, mListener));
             loadData(chats, recyclerView);
 
+
+            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    isMax = isMaxScroll();
+                }
+            });
+            recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+
+                    if (isMaxScroll())
+                        readjust();
+                }
+            });
+
+
         }
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
     private void loadData(final List<Chat> chats, final RecyclerView recyclerView) {
 
-        final Contact contact = (Contact) getActivity().getIntent()
-                .getSerializableExtra(ChatActivity.CONTACT);
         final String serialNumber = Common.getSimSerialNumber(getContext());
         DatabaseReference reference = ref.getUser().information(serialNumber)
                 .child(Constant.PHONE_NUMBER);
@@ -111,7 +137,7 @@ public class ChatFragment extends BaseFragment {
                         final String phoneNumber =
                                 dataSnapshot.getValue(String.class);
 
-//                        Log.d(TAG, "+++ " + serialNumber + phoneNumber);
+                        Log.d(TAG, "+++ " + serialNumber + phoneNumber);
 
                         if (phoneNumber == null)
                             return;
@@ -120,17 +146,7 @@ public class ChatFragment extends BaseFragment {
                         Query query = ref.getChat()
                                 .message(key)
                                 .limitToLast(20);
-                        query.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                recyclerView.smoothScrollToPosition(recyclerView.getHeight());
-                            }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
 
                         query.addChildEventListener(new ChildEventListener() {
                             String date = null;
@@ -160,13 +176,13 @@ public class ChatFragment extends BaseFragment {
                                     chat.type = 1;
                                 chat.key = dataSnapshot.getRef().getKey();
 
-//                                if (dataSnapshot.getKey() == null) return;
+                                if (chat.message == null) return;
                                 chats.add(chat);
 
 
                                 recyclerView.getAdapter().notifyItemInserted(chats.size() - 1);
                                 if (phoneNumber.equals(chat.from))
-                                    recyclerView.smoothScrollToPosition(recyclerView.getHeight());
+                                    recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
                             }
 
                             @Override
@@ -195,14 +211,35 @@ public class ChatFragment extends BaseFragment {
                                 int index = chats.indexOf(chat);
                                 chats.remove(chat);
 
-                                if (index >= 0)
+                                if (index >= 0) {
                                     recyclerView.getAdapter()
                                             .notifyItemRemoved(index);
+
+                                    if (chats.get(index - 1).type == 2 && chats.get(index).type == 2) {
+                                        chats.remove(index - 1);
+                                        recyclerView.getAdapter().notifyItemRemoved(index - 1);
+                                    }
+                                }
 
                             }
 
                             @Override
                             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                                readjust();
 
                             }
 
@@ -218,6 +255,7 @@ public class ChatFragment extends BaseFragment {
 
                     }
                 });
+
     }
 
     private Chat find(List<Chat> chats, String key) {
@@ -245,6 +283,10 @@ public class ChatFragment extends BaseFragment {
         return null;
     }
 
+    public boolean isMaxScroll() {
+        return isMaxScrollReached(recyclerView);
+    }
+
 
     @Override
     public void onAttach(Context context) {
@@ -261,6 +303,18 @@ public class ChatFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void readjust() {
+
+//        if (isMax)
+        recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+    }
+
+    static private boolean isMaxScrollReached(RecyclerView recyclerView) {
+        int maxScroll = recyclerView.computeVerticalScrollRange();
+        int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
+        return currentScroll >= maxScroll;
     }
 
     /**

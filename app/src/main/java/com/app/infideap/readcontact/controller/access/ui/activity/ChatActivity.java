@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatFragment;
@@ -21,6 +20,8 @@ import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.entity.Data;
 import com.app.infideap.readcontact.entity.FCMSend;
 import com.app.infideap.readcontact.entity.Notification;
+import com.app.infideap.readcontact.entity.PhoneNumberIndex;
+import com.app.infideap.readcontact.entity.UserInformation;
 import com.app.infideap.readcontact.entity.UserStatus;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
@@ -42,10 +43,12 @@ public class ChatActivity extends BaseActivity implements
         ChatFragment.OnListFragmentInteractionListener {
 
     public static final String CONTACT = "CONTACT";
+    private static final String TAG = ChatActivity.class.getSimpleName();
     private EditText messageEditText;
     private TextView titleToolbarTextView;
     private TextView descToolbarTextView;
     private Contact contact;
+    private ChatFragment chatFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +74,30 @@ public class ChatActivity extends BaseActivity implements
             finish();
         else {
             titleToolbarTextView.setText(contact.name);
-            partnerStatus();
+            if (contact.serial == null) {
+                ref.getPhoneNumber().getReference(contact.phoneNumber)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+//                                Toast.makeText(ChatActivity.this,
+//                                        "serial : " + dataSnapshot.getValue() + ", " +
+//                                                contact.phoneNumber, Toast.LENGTH_SHORT).show();
+                                if (dataSnapshot.getValue() == null)
+                                    return;
+
+                                PhoneNumberIndex numberIndex = dataSnapshot.getValue(PhoneNumberIndex.class);
+                                contact.serial = numberIndex.serial;
+                                init();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+            } else {
+                init();
+            }
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -109,6 +135,15 @@ public class ChatActivity extends BaseActivity implements
             }
         });
 
+
+
+    }
+
+
+    private void init() {
+        partnerStatus();
+        chatFragment = ChatFragment.newInstance(contact);
+        displayFragment(R.id.container, chatFragment);
     }
 
     private void partnerStatus() {
@@ -165,23 +200,22 @@ public class ChatActivity extends BaseActivity implements
                 .getSerializableExtra(ChatActivity.CONTACT);
         final String serial = Common.getSimSerialNumber(this);
         ref.getUser().information(serial)
-                .child(Constant.PHONE_NUMBER)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        final String phoneNumber =
-                                dataSnapshot.getValue(String.class);
-                        if (phoneNumber == null)
+                        final UserInformation userInformation =
+                                dataSnapshot.getValue(UserInformation.class);
+                        if (userInformation == null)
                             return;
 
-                        final String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
+                        final String key = Common.convertToChatKey(userInformation.phoneNumber, contact.phoneNumber);
                         FirebaseMessaging.getInstance().subscribeToTopic(key);
 
                         long millis = System.currentTimeMillis();
                         final DatabaseReference reference = ref.getChat().message(key)
                                 .push();
 
-                        final Chat chat = new Chat(message, phoneNumber, millis, Constant.MESSAGE_SEND);
+                        final Chat chat = new Chat(message, userInformation.phoneNumber, millis, Constant.MESSAGE_SEND);
 
                         reference.setValue(
                                 chat
@@ -191,9 +225,10 @@ public class ChatActivity extends BaseActivity implements
                                     public void onComplete(@NonNull Task<Void> task) {
                                         chat.status = Constant.MESSAGE_SENT;
                                         reference.setValue(chat);
-                                        pushNotification(key, reference.getKey(), chat);
                                     }
                                 });
+                        pushNotification(key, reference.getKey(), userInformation, chat);
+
                         messageEditText.setText(null);
 
                         ref.getChat().meta(key)
@@ -208,7 +243,7 @@ public class ChatActivity extends BaseActivity implements
                                 .child(Constant.LAST_UPDATED).setValue(millis);
 
 
-                        ref.getUser().message(serial)
+                        ref.getUser().message(contact.serial)
                                 .child(key)
                                 .child(Constant.LAST_UPDATED).setValue(millis);
 
@@ -223,7 +258,7 @@ public class ChatActivity extends BaseActivity implements
 
     }
 
-    private void pushNotification(final String chatKey, final String key, final Chat chat) {
+    private void pushNotification(final String chatKey, final String key, final UserInformation userInformation, final Chat chat) {
         FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
         if (instanceId.getToken() == null)
             return;
@@ -235,13 +270,16 @@ public class ChatActivity extends BaseActivity implements
                         if (dataSnapshot.getValue() == null)
                             return;
 
+
                         FCMSend fcmSend = new FCMSend();
                         fcmSend.to = dataSnapshot.getValue(String.class);
                         fcmSend.data = new Data();
                         fcmSend.data.key = key;
-                        fcmSend.data.sender = chat.from;
+                        fcmSend.data.sender = userInformation.phoneNumber;
+                        fcmSend.data.countryCode = userInformation.countryCode;
                         fcmSend.data.message = chat.message;
                         fcmSend.data.chatKey = chatKey;
+
                         fcmSend.notification = new Notification();
                         fcmSend.notification.body = chat.message;
                         fcmSend.notification.icon = "";
@@ -255,14 +293,22 @@ public class ChatActivity extends BaseActivity implements
                             @Override
                             public void onCompleted(Exception e, String result) {
                                 if (e == null) {
-                                    Toast.makeText(ChatActivity.this, "Sent", Toast.LENGTH_LONG).show();
+//                                    Toast.makeText(ChatActivity.this, "Sent", Toast.LENGTH_LONG).show();
                                     Log.d("FCM", result);
                                 } else {
-                                    Toast.makeText(ChatActivity.this, "Not sent", Toast.LENGTH_LONG).show();
+//                                    Toast.makeText(ChatActivity.this, "Not sent", Toast.LENGTH_LONG).show();
                                     e.printStackTrace();
                                 }
                             }
                         });
+                        final DatabaseReference databaseReference = ref.getUser()
+                                .notification(contact.serial)
+                                .child(Constant.ITEMS)
+                                .push();
+
+                        databaseReference
+                                .setValue(fcmSend.data);
+
 
                     }
 

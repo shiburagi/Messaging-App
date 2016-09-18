@@ -8,4 +8,5 @@ public class Data {
     public long datatime;
     public String message;
     public String sender;
+    public String countryCode;
 }

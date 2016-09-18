@@ -11,7 +11,9 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.app.infideap.readcontact.R;
+import com.app.infideap.readcontact.controller.access.ui.activity.ChatActivity;
 import com.app.infideap.readcontact.controller.access.ui.activity.MainActivity;
+import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.entity.Data;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
@@ -22,6 +24,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -40,6 +43,8 @@ import java.util.Locale;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
     private final References references = References.getInstance();
+    private static Query query;
+    private boolean sound;
 
     //    public static android.support.v4.app.NotificationCompat.InboxStyle inboxStyle;
 //    public static TreeMap<String, RemoteMessage> hashMap = new TreeMap<>();
@@ -76,25 +81,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
 
-        updateStatus(remoteMessage);
-        displayNotification(remoteMessage);
+        sound = true;
+        if (query == null)
+            displayNotification(remoteMessage);
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
-    private void updateStatus(final RemoteMessage remoteMessage) {
-        final Data data = convert(remoteMessage);
+    private void updateStatus(final DatabaseReference databaseReference, Data data) {
 
         Log.d(TAG, data.chatKey + "," + data.key);
 
 
 //        hashMap.put(key, remoteMessage);
 
-        final DatabaseReference databaseReference = references.getUser().notification(Common.getSimSerialNumber(this))
-                .child(Constant.ITEMS)
-                .push();
-        databaseReference
-                .setValue(data);
 
         final DatabaseReference reference = references.getChat().message(
                 data.chatKey
@@ -147,11 +147,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      *
      * @param data FCM message body received.
      */
-    private void sendNotification(List<Data> datas, Data data) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+    private void sendNotification(List<Data> datas, final Data data) {
+
 
 //        String from = messageBody.getNotification().getTitle();
 //        from = from == null ? "<>" : from;
@@ -163,26 +160,44 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //        );
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        android.support.v4.app.NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentText("")
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+                .setAutoCancel(true);
+        if (sound)
+            notificationBuilder.setSound(defaultSoundUri);
 
-        android.support.v4.app.NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+        sound = false;
 
-        String from = data.sender;
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+        Contact contactDetail = Common.contactDetail(this, data.sender.substring(data.countryCode.length() + 1));
+        String from;
+        if (contactDetail == null) {
+            from = data.sender;
+            contactDetail = new Contact();
+            contactDetail.name = from;
+
+        } else {
+            from = contactDetail.name;
+
+        }
+        contactDetail.phoneNumber = data.sender;
+
         from = from == null ? "<>" : from;
 
 
-        if (datas.size() == 1) {
-            notificationBuilder.setContentTitle(from);
-        } else {
-            notificationBuilder.setContentTitle(getResources().getString(R.string.app_name));
-        }
+        PendingIntent pendingIntent;
+
+        boolean isSingleSender = true;
+        String prevFrom = from;
         for (Data _data : datas) {
-            from = _data.sender;
+
+            Contact contact = Common.contactDetail(this, _data.sender.substring(data.countryCode.length() + 1));
+            if (contact == null)
+                from = _data.sender;
+            else
+                from = contact.name;
             from = from == null ? "<>" : from;
             String body = String.format(
                     Locale.getDefault(),
@@ -191,8 +206,46 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     _data.message
             );
             inboxStyle.addLine(body);
+
+            if (!prevFrom.equals(from))
+                isSingleSender = false;
         }
+
+        if (isSingleSender) {
+            String body = String.format(
+                    Locale.getDefault(),
+                    "%s : %s",
+                    from,
+                    data.message
+            );
+
+
+            Intent intent = new Intent(this, ChatActivity.class);
+            intent.putExtra(ChatActivity.CONTACT, contactDetail);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+
+            notificationBuilder.setContentTitle(from)
+                    .setContentIntent(pendingIntent);
+            notificationBuilder.setContentText(body);
+
+
+        } else {
+
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+
+            notificationBuilder.setContentTitle(getResources().getString(R.string.app_name))
+                    .setContentIntent(pendingIntent);
+
+
+        }
+
         notificationBuilder.setStyle(inboxStyle);
+
 //        notificationBuilder.setStyle(displayNotification(messageBody));
 
         NotificationManager notificationManager =
@@ -200,24 +253,49 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
 
-        return ;
+        return;
     }
 
     private NotificationCompat.InboxStyle displayNotification(final RemoteMessage messageBody) {
         final NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
-        references.getUser().notification(Common.getSimSerialNumber(this))
-                .child(Constant.ITEMS).orderByChild(Constant.DATETIME)
+        query = references.getUser().notification(Common.getSimSerialNumber(this))
+                .child(Constant.ITEMS).orderByChild(Constant.DATETIME);
+        query
                 .addChildEventListener(
                         new ChildEventListener() {
                             List<Data> datas = new ArrayList<Data>();
 
                             @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                Data data = dataSnapshot.getValue(Data.class);
+                            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                                final Data data = dataSnapshot.getValue(Data.class);
 
-                                datas.add(data);
-                                sendNotification(datas, data);
+                                references.getChat().message(
+                                        data.chatKey
+                                ).child(data.key).child(Constant.STATUS)
+                                        .addListenerForSingleValueEvent(
+                                                new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot _dataSnapshot) {
+                                                        if (_dataSnapshot.getValue() != null) {
+                                                            if (_dataSnapshot.getValue(Integer.class) == Constant.MESSAGE_READ) {
+                                                                dataSnapshot.getRef().setValue(null);
+                                                                return;
+                                                            }
+                                                        }
+                                                        datas.add(data);
+                                                        updateStatus(dataSnapshot.getRef(), data);
+                                                        sendNotification(datas, data);
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+
+                                                    }
+                                                }
+                                        );
+
                             }
 
                             @Override
@@ -234,7 +312,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                                 if (datas.size() > 0)
                                     sendNotification(datas, data);
-                                else{
+                                else {
                                     NotificationManager notificationManager =
                                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                                     notificationManager.cancel(0);

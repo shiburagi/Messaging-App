@@ -33,4 +33,6 @@ public class Constant {
     public static final int MESSAGE_RECEIVE = 2;
     public static final int MESSAGE_READ = 3;
     public static final String ITEMS = "items";
+    public static final String UNREAD = "unread";
+    public static final String CHATKEY = "chatKey";
 }

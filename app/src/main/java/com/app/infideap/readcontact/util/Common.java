@@ -18,6 +18,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
@@ -32,6 +33,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.app.infideap.readcontact.R;
+import com.app.infideap.readcontact.entity.Contact;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -985,15 +987,68 @@ public class Common {
     private static long getMillisForDateOnly(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        calendar.set(Calendar.HOUR_OF_DAY,0);
-        calendar.set(Calendar.MINUTE,0);
-        calendar.set(Calendar.SECOND,0);
-        calendar.set(Calendar.MILLISECOND,0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
 
         return calendar.getTimeInMillis();
     }
 
+    public static Contact contactDetail(Context context, String shortPhoneNumber) {
+        Cursor cursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                "replace(replace(replace(replace(" +
+                        ContactsContract.CommonDataKinds.Phone.NUMBER +
+                        ", '(', ''), ')',''), ' ', ''), '-', '') " +
+                        " like ? AND " +
+                        ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
+                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+                new String[]{
+                        "%".concat(shortPhoneNumber).concat("%")
+                }, null);
+        Contact contact = null;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                String name = cursor.getString(
+                        cursor.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+                        )
+                );
+                String phoneNumber = cursor.getString(
+                        cursor.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER
+                        )
+                );
 
+                int type;
+
+                switch (cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) {
+                    case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                        // do something with the Home number here...
+                        type = R.string.home;
+                        break;
+                    case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                        // do something with the Mobile number here...
+                        type = R.string.mobile;
+                        break;
+                    case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                        // do something with the Work number here...
+                        type = R.string.work;
+                        break;
+                    default:
+                        type = R.string.unknown;
+                        break;
+                }
+
+
+                contact = new Contact(name, phoneNumber, context.getResources().getString(type));
+            }
+
+            cursor.close();
+        }
+        return contact;
+
+    }
 
 
     public interface OnUpgradeListener {

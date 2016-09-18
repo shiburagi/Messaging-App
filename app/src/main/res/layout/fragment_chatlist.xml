@@ -36,39 +36,70 @@
 
                 <TextView
                     android:id="@+id/id"
-                    android:layout_toLeftOf="@+id/type"
                     android:layout_width="match_parent"
-                    android:textStyle="bold"
                     android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/type"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="#000"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:layout_alignParentRight="true"
                     android:id="@+id/type"
-                    android:text="00:00"
-                    android:textSize="12sp"
-                    android:textAllCaps="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                    android:text="00:00"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textSize="12sp" />
 
             </RelativeLayout>
+
             <android.support.v4.widget.Space
                 android:layout_width="wrap_content"
                 android:layout_height="5dp" />
-            <TextView
-                android:id="@+id/content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/layout_count"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <FrameLayout
+                    android:id="@+id/layout_count"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin">
+                    <ImageView
+                        android:id="@+id/imageView_count"
+                        android:src="@drawable/layerlist_circle_primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <TextView
+                        android:layout_gravity="center"
+                        android:id="@+id/count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textAllCaps="true"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="#fff"
+                        android:textSize="12sp" />
+                </FrameLayout>
+            </RelativeLayout>
 
         </LinearLayout>
 

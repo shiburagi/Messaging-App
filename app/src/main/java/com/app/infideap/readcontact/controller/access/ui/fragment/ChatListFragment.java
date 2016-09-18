@@ -1,21 +1,21 @@
 package com.app.infideap.readcontact.controller.access.ui.fragment;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ChatListRecyclerViewAdapter;
 import com.app.infideap.readcontact.entity.ChatMeta;
 import com.app.infideap.readcontact.entity.Contact;
-import com.app.infideap.readcontact.entity.User;
+import com.app.infideap.readcontact.entity.Data;
+import com.app.infideap.readcontact.entity.UserInformation;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
 import com.google.firebase.database.ChildEventListener;
@@ -97,8 +97,9 @@ public class ChatListFragment extends BaseFragment {
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        ref.getChat().meta(dataSnapshot.getKey())
-                                .addListenerForSingleValueEvent(
+                        final String key = dataSnapshot.getKey();
+                        ref.getChat().meta(key)
+                                .addValueEventListener(
                                         new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -109,9 +110,21 @@ public class ChatListFragment extends BaseFragment {
                                                 ChatMeta chatMeta = dataSnapshot.getValue(ChatMeta.class);
                                                 for (String _serial : chatMeta.serials) {
                                                     if (!serial.equals(_serial)) {
+                                                        Contact contact = find(contacts, _serial);
 
-                                                        getContact(_serial, chatMeta.lastMessage, chatMeta.lastUpdate,
-                                                                contacts, recyclerView);
+                                                        if (contact == null)
+                                                            getContact(
+                                                                    key,
+                                                                    _serial, chatMeta.lastMessage, chatMeta.lastUpdate,
+                                                                    contacts, recyclerView);
+                                                        else {
+                                                            contact.lastMessage = chatMeta.lastMessage;
+                                                            int index = contacts.indexOf(contact);
+                                                            if (index > -1) {
+                                                                recyclerView.getAdapter()
+                                                                        .notifyItemChanged(index);
+                                                            }
+                                                        }
                                                         break;
                                                     }
                                                 }
@@ -149,7 +162,14 @@ public class ChatListFragment extends BaseFragment {
                 });
     }
 
-    private void getContact(final String serial, final String lastMessage, final long lastUpdated,
+    private Contact find(List<Contact> contacts, String serial) {
+        for (Contact contact : contacts)
+            if (contact.serial.equals(serial))
+                return contact;
+        return null;
+    }
+
+    private void getContact(final String key, final String serial, final String lastMessage, final long lastUpdated,
                             final List<Contact> contacts, final RecyclerView recyclerView) {
 
         ref.getUser().information(serial)
@@ -160,17 +180,19 @@ public class ChatListFragment extends BaseFragment {
                                 if (dataSnapshot.getValue() == null)
                                     return;
 
-                                User user = dataSnapshot.getValue(User.class);
-                                Contact contact = contactDetail(user.shortPhoneNumber);
+                                UserInformation userInformation = dataSnapshot.getValue(UserInformation.class);
+                                Contact contact = Common.contactDetail(getContext(), userInformation.shortPhoneNumber);
                                 if (contact == null) {
                                     contact = new Contact();
-                                    contact.name = user.phoneNumber;
+                                    contact.name = userInformation.phoneNumber;
                                 }
 
-                                contact.phoneNumber = user.phoneNumber;
+                                contact.phoneNumber = userInformation.phoneNumber;
                                 contact.lastMessage = lastMessage;
                                 contact.lastUpdated = lastUpdated;
                                 contact.serial = serial;
+
+                                getUnreadMessage(key, contact, contacts, recyclerView);
 
                                 contacts.add(contact);
                                 recyclerView.getAdapter().notifyItemInserted(contacts.size() - 1);
@@ -186,59 +208,70 @@ public class ChatListFragment extends BaseFragment {
         recyclerView.getAdapter().notifyItemInserted(contacts.size() - 1);
     }
 
-    private Contact contactDetail(String shortPhoneNumber) {
-        Cursor cursor = getContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                "replace(replace(replace(replace(" +
-                        ContactsContract.CommonDataKinds.Phone.NUMBER +
-                        ", '(', ''), ')',''), ' ', ''), '-', '') " +
-                        " like ? AND " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
-                new String[]{
-                        "%".concat(shortPhoneNumber).concat("%")
-                }, null);
-        Contact contact = null;
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                String name = cursor.getString(
-                        cursor.getColumnIndex(
-                                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-                        )
-                );
-                String phoneNumber = cursor.getString(
-                        cursor.getColumnIndex(
-                                ContactsContract.CommonDataKinds.Phone.NUMBER
-                        )
-                );
+    private void getUnreadMessage(String key, final Contact contact, final List<Contact> contacts, final RecyclerView recyclerView) {
 
-                int type;
+        Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
+//        ref.getChat().message(key)
+//                .orderByChild(Constant.STATUS)
+//                .endAt(2)
+        ref.getUser().notification(Common.getSimSerialNumber(getContext()))
+                .child(Constant.ITEMS)
+                .orderByChild(Constant.CHATKEY)
+                .equalTo(key)
+                .addChildEventListener(new ChildEventListener() {
 
-                switch (cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) {
-                    case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
-                        // do something with the Home number here...
-                        type = R.string.home;
-                        break;
-                    case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
-                        // do something with the Mobile number here...
-                        type = R.string.mobile;
-                        break;
-                    case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
-                        // do something with the Work number here...
-                        type = R.string.work;
-                        break;
-                    default:
-                        type = R.string.unknown;
-                        break;
-                }
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        contact.unreadCount++;
+                        int index = contacts.indexOf(contact);
+                        if (index > -1)
+                            recyclerView.getAdapter().notifyItemChanged(index);
+                        else {
+                            recyclerView.getAdapter().notifyItemChanged(0, recyclerView.getChildCount());
+                        }
+                    }
 
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                        Chat chat = dataSnapshot.getValue(Chat.class);
+//                        if (chat != null)
+//                            if (chat.status == Constant.MESSAGE_READ) {
+//                                contact.unreadCount--;
+//
+//                                int index = contacts.indexOf(contact);
+//                                if (index > -1)
+//                                    recyclerView.getAdapter().notifyItemChanged(index);
+//                                else{
+//                                    recyclerView.getAdapter().notifyItemChanged(0,recyclerView.getChildCount());
+//                                }
+//                            }
+                    }
 
-                contact = new Contact(name, phoneNumber, getResources().getString(type));
-            }
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        Data chat = dataSnapshot.getValue(Data.class);
+                        if (chat != null) {
+                            contact.unreadCount--;
 
-            cursor.close();
-        }
-        return contact;
+                            int index = contacts.indexOf(contact);
+                            if (index > -1)
+                                recyclerView.getAdapter().notifyItemChanged(index);
+                            else {
+                                recyclerView.getAdapter().notifyItemChanged(0, recyclerView.getChildCount());
+                            }
+                        }
+                    }
 
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
 

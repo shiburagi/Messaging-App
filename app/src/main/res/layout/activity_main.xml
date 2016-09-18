@@ -37,34 +37,41 @@
 
     <include layout="@layout/content_main" />
 
-    <!--<io.codetail.widget.RevealFrameLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:background="@android:drawable/dialog_holo_light_frame">-->
-
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appBar_search"
+    <io.codetail.widget.RevealFrameLayout
+        android:id="@+id/layout_appbar_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_search"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBar_search"
+            android:layout_marginTop="-12dp"
+            android:layout_marginLeft="-12dp"
+            android:layout_marginRight="-12dp"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="#fff"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            android:theme="@style/AppTheme.AppBarOverlay">
 
-            <EditText
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar_search"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/searchwithdot"
-                android:textColorHint="#666" />
-        </android.support.v7.widget.Toolbar>
+                android:layout_height="?attr/actionBarSize"
+                android:background="#fff"
+                app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/searchwithdot"
+                    android:textColorHint="#666" />
+            </android.support.v7.widget.Toolbar>
 
 
-    </android.support.design.widget.AppBarLayout>
-    <!--</io.codetail.widget.RevealFrameLayout>-->
+        </android.support.design.widget.AppBarLayout>
+
+
+    </io.codetail.widget.RevealFrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

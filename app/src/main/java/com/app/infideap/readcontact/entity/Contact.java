@@ -14,6 +14,7 @@ public class Contact implements Serializable{
     public String serial;
     public String lastMessage;
     public long lastUpdated;
+    public int unreadCount;
 
     public Contact(String name, String phoneNumber, String type) {
         this.name = name;

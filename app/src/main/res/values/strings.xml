@@ -21,7 +21,7 @@
     <string name="phonenumberalreadybeenused">Phone number already been used.</string>
     <string name="yesterday">Yesterday</string>
     <string name="today">Today</string>
-    <string name="online">Online</string>
+    <string name="online">online</string>
     <string name="lastseen">Last seen</string>
     <string name="typing">typing...</string>
 </resources>

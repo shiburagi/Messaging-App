@@ -94,6 +94,7 @@ public class MainActivity extends BaseActivity implements
         isRunnning = true;
 
 
+        appBar.setExpanded(true);
     }
 
     @Override
@@ -179,16 +180,10 @@ public class MainActivity extends BaseActivity implements
     }
 
     private void hideSearch() {
-        appBar.setVisibility(View.VISIBLE);
 //        searchToolBar.setVisibility(View.GONE);
 //        appBar.setExpanded(true);
 
-        AnimatorSet set = new AnimatorSet();
-        set.playTogether(
-                ObjectAnimator.ofFloat(appBar, "translationY", 0),
-                ObjectAnimator.ofFloat(viewPager, "translationY", 0)
-        );
-        set.setDuration(200).start();
+
 
 
         // get the center for the clipping circle
@@ -217,6 +212,15 @@ public class MainActivity extends BaseActivity implements
 //                    searchToolBar.setAlpha(0);
                     toolbar.setAlpha(1f);
                     searchAppBar.setVisibility(View.GONE);
+                    appBar.setVisibility(View.VISIBLE);
+
+                    AnimatorSet set = new AnimatorSet();
+                    set.playTogether(
+                            ObjectAnimator.ofFloat(appBar, "translationY", 0),
+                            ObjectAnimator.ofFloat(appBar, "alpha", 1),
+                            ObjectAnimator.ofFloat(viewPager, "translationY", 0)
+                    );
+                    set.setDuration(100).start();
                 }
 
                 @Override
@@ -262,19 +266,11 @@ public class MainActivity extends BaseActivity implements
             AnimatorSet set = new AnimatorSet();
             set.playTogether(
                     ObjectAnimator.ofFloat(appBar, "translationY", -tabLayout.getHeight()),
-                    ObjectAnimator.ofFloat(viewPager, "translationY", -tabLayout.getHeight())
+                    ObjectAnimator.ofFloat(viewPager, "translationY", -tabLayout.getHeight()),
+                    ObjectAnimator.ofFloat(appBar, "alpha", 0)
             );
-            set.setDuration(200).start();
+            set.setDuration(100).start();
 
-            toolbar.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    appBar.setVisibility(View.GONE);
-                }
-            }, 200);
-
-
-            searchAppBar.setVisibility(View.VISIBLE);
 
             // get the center for the clipping circle
 
@@ -286,18 +282,29 @@ public class MainActivity extends BaseActivity implements
             int dy = Math.max(cy, toolbar.getHeight() - cy);
             float finalRadius = (float) Math.hypot(dx, dy);
 
-            Animator animator;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                animator = ViewAnimationUtils
-                        .createCircularReveal(searchAppBar, cx, cy, 0, finalRadius);
-                animator.setInterpolator(new AccelerateDecelerateInterpolator());
-                animator.setDuration(200);
-                animator.start();
+            final Animator animator;
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            animator = io.codetail.animation.ViewAnimationUtils
+                    .createCircularReveal(searchAppBar, cx, cy, 0, finalRadius);
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            animator.setDuration(200);
+//                animator.start();
 
-            } else
-                searchAppBar.setVisibility(View.VISIBLE);
+//            } else {
+////                searchAppBar.setVisibility(View.VISIBLE);
+//                animator = null;
+//            }
 
 
+            toolbar.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    searchAppBar.setVisibility(View.VISIBLE);
+                    appBar.setVisibility(View.GONE);
+                    if (animator != null)
+                        animator.start();
+                }
+            }, 100);
             return true;
         }
 

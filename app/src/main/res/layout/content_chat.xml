@@ -13,19 +13,23 @@
         android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <fragment
-            android:id="@+id/fragment"
+        <FrameLayout
+            android:orientation="vertical"
+            android:id="@+id/container"
+            android:layout_above="@+id/layout_field"
             android:name="com.app.infideap.readcontact.controller.access.ui.fragment.ChatFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1" />
 
         <LinearLayout
+            android:id="@+id/layout_field"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="@dimen/chat_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,6 +82,6 @@
             </FrameLayout>
 
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
