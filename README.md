@@ -8,6 +8,10 @@ I will keep improve this project code until it stable and useful.
  * Contact Listing
  * Realtime chat
  * Push notification
+ 
+## Preview
+![alt tag](https://github.com/shiburagi/Messaging-App/blob/dev_shiburagi/preview/preview1.gif)
+
 
 Android 15.0+ support
 
