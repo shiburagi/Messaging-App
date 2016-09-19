@@ -1,7 +1,8 @@
 # Messaging App
 
 **Messaging App** is an **Android Application project**, developed to create an app likely same as Whatsapp. 
-This application used **Firebase as storage**
+This application used **Firebase as storage**.
+
 I will keep improve this project code until it stable and useful.
 
 ## Features
