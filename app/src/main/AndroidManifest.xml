@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.app.infideap.readcontact">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -14,29 +15,41 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service
-            android:name=".controller.access.service.MyFirebaseInstanceIdService">
+        <service android:name=".controller.access.service.MyFirebaseInstanceIdService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
-        <service
-            android:name=".controller.access.service.MyFirebaseMessagingService">
+        <service android:name=".controller.access.service.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <receiver android:name=".controller.access.receiver.ConnectionWakefulReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="android.location.PROVIDERS_CHANGED" />
+
+                <category android:name="com.app.connectivity" />
+            </intent-filter>
+        </receiver>
 
         <activity
-            android:launchMode="singleTop"
             android:name=".controller.access.ui.activity.MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
         <activity
+
+            android:launchMode="singleTask"
             android:name=".controller.access.ui.activity.ChatActivity"
+            android:windowSoftInputMode="adjustResize"
             android:label="@string/title_activity_chat"
             android:parentActivityName=".controller.access.ui.activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />

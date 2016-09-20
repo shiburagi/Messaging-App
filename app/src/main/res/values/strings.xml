@@ -24,4 +24,8 @@
     <string name="online">online</string>
     <string name="lastseen">Last seen</string>
     <string name="typing">typing...</string>
+    <string name="messages">messages</string>
+    <string name="messagesfrom">messages from</string>
+    <string name="chats">chats</string>
+    <string name="message">message</string>
 </resources>

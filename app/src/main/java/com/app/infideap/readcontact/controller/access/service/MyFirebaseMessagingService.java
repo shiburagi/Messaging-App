@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -36,6 +37,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.TreeSet;
 
 /**
  * Created by Shiburagi on 12/09/2016.
@@ -84,6 +86,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         sound = true;
         if (query == null)
             displayNotification(remoteMessage);
+
+
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
     }
@@ -162,7 +166,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentText("")
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setAutoCancel(true);
         if (sound)
             notificationBuilder.setSound(defaultSoundUri);
@@ -191,6 +195,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         boolean isSingleSender = true;
         String prevFrom = from;
+        TreeSet<String> strings = new TreeSet<>();
         for (Data _data : datas) {
 
             Contact contact = Common.contactDetail(this, _data.sender.substring(data.countryCode.length() + 1));
@@ -206,18 +211,28 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     _data.message
             );
             inboxStyle.addLine(body);
-
+            strings.add(from);
             if (!prevFrom.equals(from))
                 isSingleSender = false;
         }
 
         if (isSingleSender) {
-            String body = String.format(
-                    Locale.getDefault(),
-                    "%s : %s",
-                    from,
-                    data.message
-            );
+
+            String contentText;
+            if (datas.size() > 1)
+                contentText = String.format(
+                        Locale.getDefault(),
+                        "%d %s",
+                        datas.size(),
+                        getResources().getString(R.string.messages).toLowerCase()
+                );
+            else
+                contentText = String.format(
+                        Locale.getDefault(),
+                        "%s : %s",
+                        from,
+                        data.message
+                );
 
 
             Intent intent = new Intent(this, ChatActivity.class);
@@ -228,10 +243,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             notificationBuilder.setContentTitle(from)
                     .setContentIntent(pendingIntent);
-            notificationBuilder.setContentText(body);
+            notificationBuilder.setContentText(contentText);
+            if (datas.size() > 1)
+                notificationBuilder.addAction(0, contentText, pendingIntent);
 
 
         } else {
+
+            String contentText = String.format(
+                    Locale.getDefault(),
+                    "%d %s %d %s",
+                    datas.size(),
+                    getResources().getString(R.string.messagesfrom).toLowerCase(),
+                    strings.size(),
+                    strings.size() > 1 ?
+                            getResources().getString(R.string.chats).toLowerCase() :
+                            getResources().getString(R.string.chat).toLowerCase()
+            );
 
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -239,7 +267,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     PendingIntent.FLAG_ONE_SHOT);
 
             notificationBuilder.setContentTitle(getResources().getString(R.string.app_name))
+                    .setContentText("Notification from Lanes" + datas.size())
                     .setContentIntent(pendingIntent);
+            notificationBuilder.setContentText(contentText);
+            notificationBuilder.addAction(0, contentText, pendingIntent);
 
 
         }

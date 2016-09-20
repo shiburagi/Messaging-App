@@ -54,7 +54,9 @@
                     <com.app.infideap.stylishwidget.view.AEditText
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:padding="12dp"
                         android:layout_weight="1"
+                        android:background="#0000"
                         android:id="@+id/editText_message"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
                 </LinearLayout>

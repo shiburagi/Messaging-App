@@ -2,8 +2,11 @@ package com.app.infideap.readcontact.controller.access.ui.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -14,6 +17,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -44,6 +48,7 @@ public class BaseActivity extends AppCompatActivity {
     //    protected FirebaseDatabase database;
     protected FirebaseAuth auth;
     protected References ref;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,25 +60,61 @@ public class BaseActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         ref = References.getInstance();
 
+        receiver = new BroadcastReceiver() {
 
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String s = intent.getStringExtra(Common.COPA_MESSAGE);
+                int code = intent.getIntExtra(Common.COPA_CODE, 0);
+                switch (code) {
+                    case Constant.HAS_ACTIVE_CONNECTION:
+                        updateStatus();
+                        break;
+
+                }
+            }
+        };
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         checkAppPermission();
+       updateStatus();
+    }
 
-        if (auth.getCurrentUser() != null)
+
+    private void updateStatus() {
+        if (auth.getCurrentUser() != null) {
             ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.ACTIVE).setValue(1);
+
+            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.ACTIVE).onDisconnect().setValue(0);
+            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.LAST_SEEN).onDisconnect().setValue(System.currentTimeMillis());
+            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.ACTION).onDisconnect().setValue(0);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (auth.getCurrentUser() != null) {
-            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.ACTIVE).setValue(0);
-            ref.getUser().status(Common.getSimSerialNumber(this)).child(Constant.LAST_SEEN).setValue(System.currentTimeMillis());
-        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+                new IntentFilter(Common.COPA_RESULT)
+        );
+
+
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     @Override

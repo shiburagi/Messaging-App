@@ -116,7 +116,7 @@ public class ContactFragment extends BaseFragment {
                         ref.getPhoneNumber().getReference()
                                 .orderByChild(Constant.PHONE_NUMBER_INDEX)
                                 .startAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0))
-                                .endAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9))
+//                                .endAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9))
                                 .limitToFirst(1)
                                 .addChildEventListener(
                                         new ChildEventListener() {
@@ -126,11 +126,24 @@ public class ContactFragment extends BaseFragment {
                                                 PhoneNumberIndex numberIndex = dataSnapshot
                                                         .getValue(PhoneNumberIndex.class);
 
-                                                boolean equal =
-                                                        numberIndex.phoneNumber.substring(
-                                                                numberIndex.phoneNumber.length()
-                                                                        - contact.phoneNumber.length()
-                                                        ).equals(contact.phoneNumber);
+                                                boolean equal;
+                                                int diff = numberIndex.phoneNumber.length()
+                                                        - contact.phoneNumber.length();
+                                                if (diff >= 0)
+                                                    equal =
+                                                            numberIndex.phoneNumber.substring(
+                                                                    Math.abs(
+                                                                            diff
+                                                                    )
+                                                            ).equals(contact.phoneNumber);
+                                                else
+                                                    equal = numberIndex.phoneNumber.equals(
+                                                            contact.phoneNumber
+                                                                    .substring(
+                                                                            Math.abs(
+                                                                                    diff
+                                                                            )
+                                                                    ));
 
 
                                                 if (equal) {

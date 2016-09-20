@@ -1,2 +1,356 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-analytics/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="88848548ab56d4fbf3d2d1b0c85bf1ff9b4c1f4b">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-analytics-9.4.0_a54d119d5a80e3072ad0ccbe8acb8709235bce3e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-ui-24.2.1_13dd4763e40007445ee33a4188f8a8156bd69e0b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="3dee4ce5844d39d843d503fb8fe04e51e5bfffac">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-base-9.4.0_96417058c9e22472936ce9511886ead1798045e0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-auth-common/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="34762013d39dbe6c656050589c44e8b61b9a2c5d">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-auth-common-9.4.0_832eec0bbca9174c13eecc832db8870fdc81c800.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="9c4c3bc902450c39ed54de170db4fb12aea20a35">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-utils-24.2.1_cbdde39fcd4eeec23a55538b9ce2dc14c24638c8.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.github.ozodrukh/CircularReveal/2.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="0ea06f21732a3f11bac13796ada56f100d1dd650">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.github.ozodrukh-CircularReveal-2.0.1_0e3c84443bdbe91119bba7d339a08ce8aad3e533.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="d5c731fc64c03dfe04d51134955b483551c35849">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-support-vector-drawable-24.2.1_cc729a14d1a0597357d1cb3a0ca3b2c21a9d171f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-database/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="84bf369090a8f7e293817efbd6ccf31ada1be32b">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-database-9.4.0_91831de53ad4ca3ef12ffdf4225b0c3c87c54b74.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_89babfccfcc7e08a1b31fa98e57638c29241357d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/Read-Contact/stylishwidget/unspecified/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="cfe5b9e6ad6214871e8951331d426e043e5567c1">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/Read-Contact-stylishwidget-unspecified_e0ce4f67164c210a4e7cc753204e196b3b080ef1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="c5e6490573cd2cc8018417f60ddd251138b6ed61">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-cardview-v7-24.2.1_0618cea67456b80c9de3d04cd25a985251f54855.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-support-media-compat-24.2.1_9856e78ab329a9a64d3910eb26160f9dc900bde6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/24.2.1/support-annotations-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/support-annotations-24.2.1_8627b481a6b835bef25fa56249b0bc269143732b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-support-compat-24.2.1_fadf398c8eb21f0a9e35d351d3cd151ba1478126.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-basement-9.4.0_a8b5ddc4720a8b855377e26146b9ed4da26c6a8f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-auth/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="4b630471536351be7c3c3100735c75b7ad2cbd84">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-auth-9.4.0_11eedc5a7b9955594f1b4b23c62c19d3749b5d0e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="7521486d9bfd2cd9e756e0cf75ed7d97f2ce2d3b">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-recyclerview-v7-24.2.1_896cc6102fe675ad283b254e0acf31dff974b269.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-iid/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="3b7173b3df4c7029699919414400041f64519e34">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-iid-9.4.0_205c6a1cf6693ebe2aa34d8effe3999725aae6c7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_3947709d383c11627d0ce2c85bc29c05a85b75b7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-common/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="18b5697c65c4fe5b7381613b8b8ae9ac52e26fa7">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-common-9.4.0_fac7bcac17df7a19271fd96e26e6dc0048558921.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.7/751f548c85fa49f330cecbb1875893f971b33c4e/gson-2.7.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/gson-2.7_c5ba8f1d462ade932121d84293a7ad21cd2d9693.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="867dad63c33388ff8c7644b236579355036d075f">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_a5292da4eaace11865cc56a112483eb0a1178561.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/de.hdodenhof/circleimageview/2.1.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="a2af9c72ccaa4c5c049b500ca6ea664a4ce1f7d4">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/de.hdodenhof-circleimageview-2.1.0_bf334456684e1f66108ccb273b5f87cbcfcb2730.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/design/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="e03f47f3d1017a093bb3239d4ec47c3447f40744">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-design-24.2.1_38cabbf6d868d63676a15731cd6077eaa7fd2851.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_e7ceb465215f3cc76a76657093edc01a46794722.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-messaging/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="4b6d9b70f93bbeb872d0948bc064ae3f3f2bcbac">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-messaging-9.4.0_cb79a23b49f88c2769b9b2320f8109040a685090.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.koushikdutta.ion/ion/2.1.9/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="7e54ea31584406fcc68225a8656f384c333ff2ee">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.koushikdutta.ion-ion-2.1.9_b229847a4489c3e0b57258c54f999b0724b134e4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="935a969265b2a166b2d20415423f5f6e90fe16e0">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_8a84f07143432e40effda1937dae6bce35bd9a98.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-auth-module/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="6bc41d9d6fd12d2ef23c785a259011001f4a1a5b">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-auth-module-9.4.0_f49a692668c0f4fc2d1a2f90050ed1e5f7100003.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-24.2.1_896408a436074951df7a06e9a78f90d82f9f8b0e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-support-v4-24.2.1_9424c70ea3400255a55c30a4584a3f9be8702cac.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/.gradle/caches/modules-2/files-2.1/com.nineoldandroids/library/2.4.0/e9b63380f3a242dbdbf103a2355ad7e43bad17cb/library-2.4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/library-2.4.0_1da7d80688caca3161db7fcd30c7f010981bd4f1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-tasks/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="8a36d229011e75f0caef408e1adf0d3fd4d94e02">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-tasks-9.4.0_b551d44437f880215655d26ae8c954dd269da85e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.koushikdutta.async/androidasync/2.1.9/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="60d0e28fe7ab6da6c03b54cd8ede502284d51a81">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.koushikdutta.async-androidasync-2.1.9_12ecfb736006835e9b2a6dda4ecdd8b2646e8785.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-analytics-impl/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="a440fb3fec30ff925e9f601cc458fb6671834cb2">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-analytics-impl-9.4.0_72dbe136983a1a634e9d1f19ecf8bf012230e54b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/src/main/resources/libphonenumber-7.4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="7f9b9b2db265c323f021ec1950a8901345288b9f">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/libphonenumber-7.4.0_eb0eea296a35758fc883fbb8cb574a71d32e3ee0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.google.firebase/firebase-database-connection/9.4.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="0e4d53465cc141bec58f18a894e4c4e80633fa32">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-database-connection-9.4.0_3e3a9c858b1987c9e52d270cf865bbe7b272b96a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-support-fragment-24.2.1_e8e96a50b81db38eea1dce485abf4fb2f091f430.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
+        <dex dex="/Users/Shiburagi/Desktop/Read-Contact/app/build/intermediates/pre-dexed/debug/com.android.support-animated-vector-drawable-24.2.1_e22eddeb18b2c134b73331dbcb259f5951b78035.jar" />
+    </item>
+
+</items>

@@ -35,4 +35,7 @@ public class Constant {
     public static final String ITEMS = "items";
     public static final String UNREAD = "unread";
     public static final String CHATKEY = "chatKey";
+
+    public static final int NO_ACTIVE_CONNECTION = 20000;
+    public static final int HAS_ACTIVE_CONNECTION = 20001;
 }

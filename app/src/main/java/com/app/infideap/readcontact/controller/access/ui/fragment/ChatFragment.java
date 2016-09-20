@@ -2,6 +2,7 @@ package com.app.infideap.readcontact.controller.access.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,8 @@ import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
 import com.app.infideap.stylishwidget.Log;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -98,19 +101,32 @@ public class ChatFragment extends BaseFragment {
             loadData(chats, recyclerView);
 
 
-            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    isMax = isMaxScrollReached(recyclerView);
-                }
-            });
             recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                int height = 0;
+
                 @Override
                 public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
 
-                    if (isMaxScroll())
-                        readjust();
+                    if (i7 > i3) {
+                        int maxScroll = recyclerView.computeVerticalScrollRange();
+                        int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
+
+                        final int scroll = currentScroll +
+                                Math.abs(i7 - i3);
+
+
+                        if (scroll >= maxScroll)
+                            if (getView() != null)
+                                getView().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        recyclerView.scrollBy(0, scroll);
+
+                                    }
+                                }, 200);
+                    }
+
+                    height = view.getHeight();
                 }
             });
 
@@ -152,9 +168,23 @@ public class ChatFragment extends BaseFragment {
                             String date = null;
 
                             @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
 //
-                                Chat chat = dataSnapshot.getValue(Chat.class);
+                                final Chat chat = dataSnapshot.getValue(Chat.class);
+
+                                if (chat.status == Constant.MESSAGE_SEND) {
+                                    dataSnapshot.getRef().setValue(chat)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    chat.status = Constant.MESSAGE_SENT;
+                                                    dataSnapshot.getRef().setValue(chat);
+                                                    int index = chats.indexOf(chat);
+                                                    if (index > -1)
+                                                        recyclerView.getAdapter().notifyItemChanged(index);
+                                                }
+                                            });
+                                }
 
                                 String chatDate = Common.getDateString(chat.datetime);
                                 if (!chatDate.equals(date)) {
@@ -183,6 +213,9 @@ public class ChatFragment extends BaseFragment {
                                 recyclerView.getAdapter().notifyItemInserted(chats.size() - 1);
                                 if (phoneNumber.equals(chat.from))
                                     recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+                                if (isMaxScrollReached(recyclerView))
+                                    recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+
                             }
 
                             @Override
@@ -313,7 +346,12 @@ public class ChatFragment extends BaseFragment {
 
     static private boolean isMaxScrollReached(RecyclerView recyclerView) {
         int maxScroll = recyclerView.computeVerticalScrollRange();
+
         int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
+
+        android.util.Log.d(TAG, maxScroll + ", " + currentScroll);
+        if (maxScroll == 0)
+            return false;
         return currentScroll >= maxScroll;
     }
 

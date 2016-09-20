@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ChatListRecyclerViewAdapter;
@@ -98,46 +97,7 @@ public class ChatListFragment extends BaseFragment {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         final String key = dataSnapshot.getKey();
-                        ref.getChat().meta(key)
-                                .addValueEventListener(
-                                        new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                if (dataSnapshot.getValue() == null)
-                                                    return;
-
-                                                ChatMeta chatMeta = dataSnapshot.getValue(ChatMeta.class);
-                                                for (String _serial : chatMeta.serials) {
-                                                    if (!serial.equals(_serial)) {
-                                                        Contact contact = find(contacts, _serial);
-
-                                                        if (contact == null)
-                                                            getContact(
-                                                                    key,
-                                                                    _serial, chatMeta.lastMessage, chatMeta.lastUpdate,
-                                                                    contacts, recyclerView);
-                                                        else {
-                                                            contact.lastMessage = chatMeta.lastMessage;
-                                                            int index = contacts.indexOf(contact);
-                                                            if (index > -1) {
-                                                                recyclerView.getAdapter()
-                                                                        .notifyItemChanged(index);
-                                                            }
-                                                        }
-                                                        break;
-                                                    }
-                                                }
-
-
-                                            }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
-
-                                            }
-                                        }
-                                );
+                        getChatMeta(key, serial, contacts, recyclerView);
                     }
 
                     @Override
@@ -160,6 +120,50 @@ public class ChatListFragment extends BaseFragment {
 
                     }
                 });
+    }
+
+    private void getChatMeta(final String key, final String serial, final List<Contact> contacts, final RecyclerView recyclerView) {
+        ref.getChat().meta(key)
+                .addValueEventListener(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                if (dataSnapshot.getValue() == null)
+                                    return;
+
+                                ChatMeta chatMeta = dataSnapshot.getValue(ChatMeta.class);
+                                for (String _serial : chatMeta.serials) {
+                                    if (!serial.equals(_serial)) {
+                                        Contact contact = find(contacts, _serial);
+
+                                        if (contact == null)
+                                            getContact(
+                                                    key,
+                                                    _serial, chatMeta.lastMessage, chatMeta.lastUpdate,
+                                                    contacts, recyclerView);
+                                        else {
+                                            contact.lastUpdated = chatMeta.lastUpdate;
+                                            contact.lastMessage = chatMeta.lastMessage;
+                                            int index = contacts.indexOf(contact);
+                                            if (index > -1) {
+                                                recyclerView.getAdapter()
+                                                        .notifyItemChanged(index);
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
     }
 
     private Contact find(List<Contact> contacts, String serial) {
@@ -210,7 +214,7 @@ public class ChatListFragment extends BaseFragment {
 
     private void getUnreadMessage(String key, final Contact contact, final List<Contact> contacts, final RecyclerView recyclerView) {
 
-        Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
+//        Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
 //        ref.getChat().message(key)
 //                .orderByChild(Constant.STATUS)
 //                .endAt(2)
