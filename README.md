@@ -1,7 +1,8 @@
 # Messaging App
 
 **Messaging App** is an **Android Application project**, developed to create an app likely same as Whatsapp. 
-This application used **Firebase as storage**
+This application used **Firebase as storage**.
+
 I will keep improve this project code until it stable and useful.
 
 ## Features
@@ -16,8 +17,7 @@ I will keep improve this project code until it stable and useful.
 Android 15.0+ support
 
 ## Download
- * **JAR** : (https://github.com/shiburagi/Stylish-Widget-for-Android/tree/master/stylishwidget/jar)
- * **APK** : (https://drive.google.com/file/d/0Bw_drx3o3plaZVptWWNxWUdfSmM/view?usp=sharing) 
+ * **APK** : (https://github.com/shiburagi/Messaging-App/tree/dev_shiburagi/apk) 
 
 ## Confiquration
 
