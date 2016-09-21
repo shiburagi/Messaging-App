@@ -547,7 +547,7 @@ public class Common {
     }
 
     public static String getChatDateString(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("MMMMMMM dd, yyyy", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
 
         return format.format(date);
     }
@@ -617,6 +617,15 @@ public class Common {
         Date date = parseDateTime(dateString);
 
         return getUserDateWithTimeString(date);
+
+    }
+
+    public static String getUserDateWithTimeString(long millis) {
+
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+
+        return getUserDateWithTimeString(calendar.getTime());
 
     }
 

@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 
 import com.app.infideap.readcontact.util.References;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Logger;
 
 /**
  * Created by Shiburagi on 11/09/2016.
@@ -21,5 +23,6 @@ public class BaseFragment extends Fragment {
 //        database = FirebaseDatabase.getInstance();
         ref = References.getInstance();
         auth = FirebaseAuth.getInstance();
+
     }
 }

@@ -27,7 +27,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * A fragment representing a list of Items.
@@ -47,6 +49,8 @@ public class ChatFragment extends BaseFragment {
     private RecyclerView recyclerView;
     private boolean isMax = false;
     private boolean initialize;
+    private Query query;
+    private ChildEventListener listener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -90,7 +94,7 @@ public class ChatFragment extends BaseFragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            List<Chat> chats = new ArrayList<>();
+            final List<Chat> chats = new ArrayList<>();
 //            String mPhoneNumber = Common.getSimSerialNumber(getContext());
 //            chats.add(new Chat("Test", mPhoneNumber, System.currentTimeMillis(), 0));
 //            chats.add(new Chat("Test2", mPhoneNumber, System.currentTimeMillis(), 0));
@@ -100,6 +104,20 @@ public class ChatFragment extends BaseFragment {
             recyclerView.setAdapter(new ChatRecyclerViewAdapter(chats, mListener));
             loadData(chats, recyclerView);
 
+            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                public int limit = 20;
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (dy < 20 && chats.size() >= limit) {
+                        limit += 20;
+//                        Toast.makeText(getContext(), dy + "," + limit, Toast.LENGTH_LONG).show();
+                        query.removeEventListener(listener);
+                        query.limitToLast(limit).addChildEventListener(listener);
+                    }
+                }
+            });
 
             recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 int height = 0;
@@ -148,6 +166,7 @@ public class ChatFragment extends BaseFragment {
 
         reference
                 .addListenerForSingleValueEvent(new ValueEventListener() {
+
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         final String phoneNumber =
@@ -159,18 +178,24 @@ public class ChatFragment extends BaseFragment {
                             return;
 
                         final String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
-                        Query query = ref.getChat()
+                        query = ref.getChat()
                                 .message(key)
-                                .limitToLast(20);
+                                .orderByChild(Constant.DATETIME);
 
-
-                        query.addChildEventListener(new ChildEventListener() {
+                        listener = new ChildEventListener() {
+                            Chat chat;
                             String date = null;
+                            TreeSet<String> longs = new TreeSet<String>();
 
                             @Override
                             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
 //
-                                final Chat chat = dataSnapshot.getValue(Chat.class);
+                                chat = dataSnapshot.getValue(Chat.class);
+
+                                if (find(chats, chat) != null) {
+
+                                    return;
+                                }
 
                                 if (chat.status == Constant.MESSAGE_SEND) {
                                     dataSnapshot.getRef().setValue(chat)
@@ -186,19 +211,6 @@ public class ChatFragment extends BaseFragment {
                                             });
                                 }
 
-                                String chatDate = Common.getDateString(chat.datetime);
-                                if (!chatDate.equals(date)) {
-                                    Chat labelChat = new Chat(
-                                            Common.getUserFriendlyDateForChat(
-                                                    recyclerView.getContext(),
-                                                    chat.datetime
-                                            ), 2
-                                    );
-                                    chats.add(labelChat);
-
-                                    date = chatDate;
-                                }
-
                                 chat.chatKey = key;
                                 if (phoneNumber.equals(chat.from))
                                     chat.type = 0;
@@ -207,10 +219,36 @@ public class ChatFragment extends BaseFragment {
                                 chat.key = dataSnapshot.getRef().getKey();
 
                                 if (chat.message == null) return;
-                                chats.add(chat);
+
+                                int index = indexOf(chats, chat);
+                                chats.add(index, chat);
+                                recyclerView.getAdapter().notifyItemInserted(index);
+
+                                String chatDate = Common.getDateString(chat.datetime).split(" ")[0];
+                                if (!longs.contains(chatDate) && chats.get(
+                                        index > 0 ? index - 1 : index).type != 2) {
+                                    Chat labelChat = new Chat();
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTimeInMillis(chat.datetime);
+                                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+                                    calendar.set(Calendar.MINUTE, 0);
+                                    calendar.set(Calendar.SECOND, 0);
+                                    calendar.set(Calendar.MILLISECOND, 0);
+                                    labelChat.datetime = calendar.getTime().getTime();
+
+                                    labelChat.message = Common.getUserFriendlyDateForChat(getContext(), labelChat.datetime);
+                                    labelChat.type = 2;
+                                    chats.add(index, labelChat);
+//                                    Toast.makeText(getContext(), "Time : " + labelChat.datetime, Toast.LENGTH_LONG).show();
+
+                                    android.util.Log.d(TAG, "time : " + labelChat.datetime);
+                                    recyclerView.getAdapter().notifyItemInserted(index);
 
 
-                                recyclerView.getAdapter().notifyItemInserted(chats.size() - 1);
+                                    longs.add(chatDate);
+                                }
+
+
                                 if (phoneNumber.equals(chat.from))
                                     recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
                                 if (isMaxScrollReached(recyclerView))
@@ -265,9 +303,12 @@ public class ChatFragment extends BaseFragment {
                             public void onCancelled(DatabaseError databaseError) {
 
                             }
-                        });
+                        };
+                        query
+                                .limitToLast(20).addChildEventListener(listener);
 
-                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        query
+                                .limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -289,6 +330,18 @@ public class ChatFragment extends BaseFragment {
                     }
                 });
 
+    }
+
+    private int indexOf(List<Chat> chats, Chat chat) {
+        int i = 0;
+        for (Chat _Chat : chats) {
+            if (chat.datetime < _Chat.datetime)
+                break;
+
+            i++;
+
+        }
+        return i;
     }
 
     private Chat find(List<Chat> chats, String key) {

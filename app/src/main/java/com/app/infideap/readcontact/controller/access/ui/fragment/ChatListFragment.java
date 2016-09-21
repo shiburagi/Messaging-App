@@ -112,6 +112,7 @@ public class ChatListFragment extends BaseFragment {
 
                     @Override
                     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                        final String key = dataSnapshot.getKey();
 
                     }
 
@@ -145,11 +146,9 @@ public class ChatListFragment extends BaseFragment {
                                         else {
                                             contact.lastUpdated = chatMeta.lastUpdate;
                                             contact.lastMessage = chatMeta.lastMessage;
-                                            int index = contacts.indexOf(contact);
-                                            if (index > -1) {
-                                                recyclerView.getAdapter()
-                                                        .notifyItemChanged(index);
-                                            }
+                                            rearrange(contacts, contact, recyclerView);
+//                                            int index = contacts.indexOf(contact);
+
                                         }
                                         break;
                                     }
@@ -164,6 +163,26 @@ public class ChatListFragment extends BaseFragment {
                             }
                         }
                 );
+    }
+
+    private void rearrange(List<Contact> contacts, Contact contact, RecyclerView recyclerView) {
+        int index = contacts.indexOf(contact);
+        int i = 0;
+        for (; i < contacts.size(); i++) {
+            if (contact.lastUpdated >= contacts.get(i).lastUpdated)
+                break;
+        }
+
+        if (index != i) {
+            contacts.remove(contact);
+            contacts.add(i, contact);
+
+            recyclerView.getAdapter().notifyItemMoved(index, i);
+        } else if (index > -1) {
+            recyclerView.getAdapter()
+                    .notifyItemChanged(index);
+        }
+
     }
 
     private Contact find(List<Contact> contacts, String serial) {
@@ -198,7 +217,7 @@ public class ChatListFragment extends BaseFragment {
 
                                 getUnreadMessage(key, contact, contacts, recyclerView);
 
-                                contacts.add(contact);
+                                contacts.add(0, contact);
                                 recyclerView.getAdapter().notifyItemInserted(contacts.size() - 1);
 
                             }

@@ -19,7 +19,6 @@ import com.app.infideap.readcontact.entity.ChatMeta;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.entity.Data;
 import com.app.infideap.readcontact.entity.FCMSend;
-import com.app.infideap.readcontact.entity.Notification;
 import com.app.infideap.readcontact.entity.PhoneNumberIndex;
 import com.app.infideap.readcontact.entity.UserInformation;
 import com.app.infideap.readcontact.entity.UserStatus;
@@ -281,10 +280,10 @@ public class ChatActivity extends BaseActivity implements
                         fcmSend.data.message = chat.message;
                         fcmSend.data.chatKey = chatKey;
 
-                        fcmSend.notification = new Notification();
-                        fcmSend.notification.body = chat.message;
-                        fcmSend.notification.icon = "";
-                        fcmSend.notification.title = chat.from;
+//                        fcmSend.notification = new Notification();
+//                        fcmSend.notification.body = chat.message;
+//                        fcmSend.notification.icon = "";
+//                        fcmSend.notification.title = chat.from;
                         Ion.with(ChatActivity.this).load("https://fcm.googleapis.com/fcm/send")
                                 .setHeader(new BasicNameValuePair("Content-Type", "application/json"))
                                 .setHeader(new BasicNameValuePair("project_id", "798311058643"))

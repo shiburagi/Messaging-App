@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -31,6 +32,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.koushikdutta.ion.Ion;
 
 import org.json.JSONObject;
 
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Shiburagi on 12/09/2016.
@@ -47,6 +50,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private final References references = References.getInstance();
     private static Query query;
     private boolean sound;
+    private static ChildEventListener listener;
 
     //    public static android.support.v4.app.NotificationCompat.InboxStyle inboxStyle;
 //    public static TreeMap<String, RemoteMessage> hashMap = new TreeMap<>();
@@ -84,12 +88,52 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         sound = true;
-        if (query == null)
-            displayNotification(remoteMessage);
+        if (query != null)
+            query.removeEventListener(listener);
+
+        displayNotification(remoteMessage);
+//        pushNotification(remoteMessage);
 
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
+    }
+
+    private void pushNotification(RemoteMessage remoteMessage) {
+
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setAutoCancel(true);
+        try {
+            Bitmap bitmap = Ion.with(this).load(remoteMessage.getNotification().getIcon()).asBitmap().get();
+            notificationBuilder.setLargeIcon(bitmap);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        if (sound)
+            notificationBuilder.setSound(defaultSoundUri);
+
+        sound = false;
+
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+        inboxStyle.addLine(remoteMessage.getNotification().getBody());
+        inboxStyle.addLine(new JSONObject(remoteMessage.getData()).toString());
+
+        notificationBuilder.setContentTitle(remoteMessage.getNotification().getTitle());
+        notificationBuilder.setContentText(remoteMessage.getNotification().getBody());
+
+        notificationBuilder.setStyle(inboxStyle);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(1 /* ID of notification */, notificationBuilder.build());
+
     }
 
     private void updateStatus(final DatabaseReference databaseReference, Data data) {
@@ -292,76 +336,75 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         query = references.getUser().notification(Common.getSimSerialNumber(this))
                 .child(Constant.ITEMS).orderByChild(Constant.DATETIME);
-        query
-                .addChildEventListener(
-                        new ChildEventListener() {
-                            List<Data> datas = new ArrayList<Data>();
+        listener =
+                new ChildEventListener() {
+                    List<Data> datas = new ArrayList<Data>();
 
-                            @Override
-                            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                                final Data data = dataSnapshot.getValue(Data.class);
+                    @Override
+                    public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                        final Data data = dataSnapshot.getValue(Data.class);
 
-                                references.getChat().message(
-                                        data.chatKey
-                                ).child(data.key).child(Constant.STATUS)
-                                        .addListenerForSingleValueEvent(
-                                                new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot _dataSnapshot) {
-                                                        if (_dataSnapshot.getValue() != null) {
-                                                            if (_dataSnapshot.getValue(Integer.class) == Constant.MESSAGE_READ) {
-                                                                dataSnapshot.getRef().setValue(null);
-                                                                return;
-                                                            }
-                                                        }
-                                                        datas.add(data);
-                                                        updateStatus(dataSnapshot.getRef(), data);
-                                                        sendNotification(datas, data);
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-
+                        references.getChat().message(
+                                data.chatKey
+                        ).child(data.key).child(Constant.STATUS)
+                                .addListenerForSingleValueEvent(
+                                        new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot _dataSnapshot) {
+                                                if (_dataSnapshot.getValue() != null) {
+                                                    if (_dataSnapshot.getValue(Integer.class) == Constant.MESSAGE_READ) {
+                                                        dataSnapshot.getRef().setValue(null);
+                                                        return;
                                                     }
                                                 }
-                                        );
+                                                datas.add(data);
+                                                updateStatus(dataSnapshot.getRef(), data);
+                                                sendNotification(datas, data);
 
-                            }
+                                            }
 
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
 
-                            }
+                                            }
+                                        }
+                                );
 
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                                Data _data = dataSnapshot.getValue(Data.class);
-                                Data data = find(datas, _data);
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        Data _data = dataSnapshot.getValue(Data.class);
+                        Data data = find(datas, _data);
 //                                int index = datas.indexOf(data);
-                                datas.remove(data);
+                        datas.remove(data);
 
-                                if (datas.size() > 0)
-                                    sendNotification(datas, data);
-                                else {
-                                    NotificationManager notificationManager =
-                                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                                    notificationManager.cancel(0);
-                                }
-
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
+                        if (datas.size() > 0)
+                            sendNotification(datas, data);
+                        else {
+                            NotificationManager notificationManager =
+                                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                            notificationManager.cancel(0);
                         }
-                );
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+        query.addChildEventListener(listener);
 
         return inboxStyle;
 
