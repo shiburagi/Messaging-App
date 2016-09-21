@@ -381,6 +381,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
                         Data _data = dataSnapshot.getValue(Data.class);
                         Data data = find(datas, _data);
+
+                        if (data == null)
+                            return;
 //                                int index = datas.indexOf(data);
                         datas.remove(data);
 

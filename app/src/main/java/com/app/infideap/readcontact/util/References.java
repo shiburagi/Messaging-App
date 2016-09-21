@@ -63,7 +63,7 @@ public class References {
 
         public DatabaseReference message(String serial) {
             return getReference(serial)
-                    .child(Constant.INFORMATION);
+                    .child(Constant.MESSAGES);
         }
 
         public DatabaseReference status(String serial) {

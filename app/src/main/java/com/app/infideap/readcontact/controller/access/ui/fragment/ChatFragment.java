@@ -236,7 +236,7 @@ public class ChatFragment extends BaseFragment {
                                     calendar.set(Calendar.MILLISECOND, 0);
                                     labelChat.datetime = calendar.getTime().getTime();
 
-                                    labelChat.message = Common.getUserFriendlyDateForChat(getContext(), labelChat.datetime);
+                                    labelChat.message = Common.getUserFriendlyDateForChat(recyclerView.getContext(), labelChat.datetime);
                                     labelChat.type = 2;
                                     chats.add(index, labelChat);
 //                                    Toast.makeText(getContext(), "Time : " + labelChat.datetime, Toast.LENGTH_LONG).show();

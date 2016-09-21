@@ -26,6 +26,7 @@ import com.app.infideap.readcontact.util.Utils;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,104 +90,133 @@ public class ContactFragment extends BaseFragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            // Code to read contact
-            // Begin
-            Cursor phones = null;
-            //handler for Android M and above
-            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
-                    == PackageManager.PERMISSION_GRANTED) {
-                phones = getContext().getContentResolver()
-                        .query(ContactsQuery.CONTENT_URI, ContactsQuery.PROJECTION,
-                                ContactsQuery.SELECTION, null, ContactsQuery.SORT_ORDER);
-            }
             final List<Contact> contacts = new ArrayList<>();
-            if (phones != null) {
-                while (phones.moveToNext()) {
 
+            ref.getUser().information(Common.getSimSerialNumber(getContext())).child(Constant.PHONE_NUMBER)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            readContact(dataSnapshot.getValue(String.class), contacts, recyclerView);
 
-                    final Contact contact = getContactDetail(phones);
+                        }
 
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    if (contact != null) {
-                        if (contact.phoneNumber.length() == 0)
-                            continue;
-                        contact.display = true;
-
-
-                        ref.getPhoneNumber().getReference()
-                                .orderByChild(Constant.PHONE_NUMBER_INDEX)
-                                .startAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0))
-//                                .endAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9))
-                                .limitToFirst(1)
-                                .addChildEventListener(
-                                        new ChildEventListener() {
-                                            @Override
-                                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                                                PhoneNumberIndex numberIndex = dataSnapshot
-                                                        .getValue(PhoneNumberIndex.class);
-
-                                                boolean equal;
-                                                int diff = numberIndex.phoneNumber.length()
-                                                        - contact.phoneNumber.length();
-                                                if (diff >= 0)
-                                                    equal =
-                                                            numberIndex.phoneNumber.substring(
-                                                                    Math.abs(
-                                                                            diff
-                                                                    )
-                                                            ).equals(contact.phoneNumber);
-                                                else
-                                                    equal = numberIndex.phoneNumber.equals(
-                                                            contact.phoneNumber
-                                                                    .substring(
-                                                                            Math.abs(
-                                                                                    diff
-                                                                            )
-                                                                    ));
-
-
-                                                if (equal) {
-                                                    contact.display = true;
-                                                    contact.phoneNumber = numberIndex
-                                                            .phoneNumber;
-                                                    contact.serial = numberIndex.serial;
-                                                    contacts.add(contact);
-                                                    recyclerView.getAdapter().notifyItemInserted(
-                                                            contacts.size() - 1
-                                                    );
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                                            }
-
-                                            @Override
-                                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                                            }
-
-                                            @Override
-                                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                                            }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
-
-                                            }
-                                        }
-                                );
-                    }
-
-                }
-                phones.close();
-            }
+                        }
+                    });
             //END
 
             recyclerView.setAdapter(new ContactRecyclerViewAdapter(contacts, mListener));
+        }
+    }
+
+    private void readContact(String phoneNumber, List<Contact> contacts, RecyclerView recyclerView) {
+        // Code to read contact
+        // Begin
+        Cursor phones = null;
+        //handler for Android M and above
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED) {
+            phones = getContext().getContentResolver()
+                    .query(ContactsQuery.CONTENT_URI, ContactsQuery.PROJECTION,
+                            ContactsQuery.SELECTION, null, ContactsQuery.SORT_ORDER);
+        }
+        if (phones != null) {
+            while (phones.moveToNext()) {
+
+
+                final Contact contact = getContactDetail(phones);
+
+
+                if (contact != null) {
+                    if (contact.phoneNumber.length() == 0)
+                        continue;
+                    contact.display = true;
+
+
+                    checkPhoneNumber(phoneNumber, contacts, contact, recyclerView);
+                }
+
+            }
+            phones.close();
+        }
+    }
+
+    private void checkPhoneNumber(final String phoneNumber, final List<Contact> contacts, final Contact contact, final RecyclerView recyclerView) {
+        ref.getPhoneNumber().getReference()
+                .orderByChild(Constant.PHONE_NUMBER_INDEX)
+                .startAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 0))
+//                                .endAt(Common.convertToPhoneIndex(contact.phoneNumber.replaceAll("\\+", ""), 9))
+                .limitToFirst(1)
+                .addChildEventListener(
+                        new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                                PhoneNumberIndex numberIndex = dataSnapshot
+                                        .getValue(PhoneNumberIndex.class);
+
+                                if (!numberIndex.phoneNumber.equals(phoneNumber))
+                                    addNumber(contacts, contact, numberIndex, recyclerView);
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
+    }
+
+    private void addNumber(List<Contact> contacts, Contact contact, PhoneNumberIndex numberIndex, RecyclerView recyclerView) {
+
+
+        boolean equal;
+        int diff = numberIndex.phoneNumber.length()
+                - contact.phoneNumber.length();
+        if (diff >= 0)
+            equal =
+                    numberIndex.phoneNumber.substring(
+                            Math.abs(
+                                    diff
+                            )
+                    ).equals(contact.phoneNumber);
+        else
+            equal = numberIndex.phoneNumber.equals(
+                    contact.phoneNumber
+                            .substring(
+                                    Math.abs(
+                                            diff
+                                    )
+                            ));
+
+
+        if (equal) {
+
+            contact.display = true;
+            contact.phoneNumber = numberIndex
+                    .phoneNumber;
+            contact.serial = numberIndex.serial;
+            contacts.add(contact);
+            recyclerView.getAdapter().notifyItemInserted(
+                    contacts.size() - 1
+            );
         }
     }
 

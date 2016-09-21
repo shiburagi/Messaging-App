@@ -218,7 +218,7 @@ public class ChatListFragment extends BaseFragment {
                                 getUnreadMessage(key, contact, contacts, recyclerView);
 
                                 contacts.add(0, contact);
-                                recyclerView.getAdapter().notifyItemInserted(contacts.size() - 1);
+                                recyclerView.getAdapter().notifyItemInserted(0);
 
                             }
 
