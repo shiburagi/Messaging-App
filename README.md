@@ -13,13 +13,25 @@ I will keep improve this project code until it stable and useful.
 ## Preview
 ![alt tag](https://github.com/shiburagi/Messaging-App/blob/dev_shiburagi/preview/preview1.gif)
 
-
 Android 15.0+ support
 
 ## Download
  * **APK** : (https://github.com/shiburagi/Messaging-App/tree/dev_shiburagi/apk) 
 
 ## Confiquration
+
+
+**First** : Create a project at [Firebase](https://firebase.google.com/), please refer to [Add Firebase to your app](https://firebase.google.com/docs/android/setup#add_firebase_to_your_app)
+
+**Second** : download the Firebase config file
+
+![screenshot](https://github.com/shiburagi/Messaging-App/blob/dev_shiburagi/guide/Screen%20Shot%202016-09-21%20at%2012.59.57%20AM.png)
+
+**Third** : Replace the 'google-services.json' file in 'Read-Contact/app/' with your Firebase config file
+
+![screenshot](https://github.com/shiburagi/Messaging-App/blob/dev_shiburagi/guide/Screen%20Shot%202016-09-21%20at%2012.58.38%20AM.png)
+
+**Finally** : Now, you can run it by using your own Firebase storage.
 
 
 ## Contact
