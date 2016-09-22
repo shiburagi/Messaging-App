@@ -28,4 +28,5 @@
     <string name="messagesfrom">messages from</string>
     <string name="chats">chats</string>
     <string name="message">message</string>
+    <string name="nochatavailable">No chat available.</string>
 </resources>

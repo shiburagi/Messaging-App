@@ -44,13 +44,16 @@ public class ChatFragment extends BaseFragment {
     private static final String TAG = ChatFragment.class.getSimpleName();
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    public int limit = 20;
+
     private OnListFragmentInteractionListener mListener;
     private Contact contact;
     private RecyclerView recyclerView;
     private boolean isMax = false;
     private boolean initialize;
-    private Query query;
+    private Query queryParent;
     private ChildEventListener listener;
+    private Query query;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -78,6 +81,7 @@ public class ChatFragment extends BaseFragment {
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -95,17 +99,10 @@ public class ChatFragment extends BaseFragment {
             }
 
             final List<Chat> chats = new ArrayList<>();
-//            String mPhoneNumber = Common.getSimSerialNumber(getContext());
-//            chats.add(new Chat("Test", mPhoneNumber, System.currentTimeMillis(), 0));
-//            chats.add(new Chat("Test2", mPhoneNumber, System.currentTimeMillis(), 0));
-//            chats.add(new Chat("Test2 asdasd asdasd sadasd asdasd", mPhoneNumber, System.currentTimeMillis(), 0));
-//            chats.add(new Chat("Test2 asdasd asdasd sadasd asdasd", mPhoneNumber, System.currentTimeMillis(), 1));
-
             recyclerView.setAdapter(new ChatRecyclerViewAdapter(chats, mListener));
             loadData(chats, recyclerView);
 
             recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-                public int limit = 20;
 
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -114,7 +111,9 @@ public class ChatFragment extends BaseFragment {
                         limit += 20;
 //                        Toast.makeText(getContext(), dy + "," + limit, Toast.LENGTH_LONG).show();
                         query.removeEventListener(listener);
-                        query.limitToLast(limit).addChildEventListener(listener);
+
+                        query = queryParent.limitToLast(limit);
+                        query.addChildEventListener(listener);
                     }
                 }
             });
@@ -178,7 +177,7 @@ public class ChatFragment extends BaseFragment {
                             return;
 
                         final String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
-                        query = ref.getChat()
+                        queryParent = ref.getChat()
                                 .message(key)
                                 .orderByChild(Constant.DATETIME);
 
@@ -304,11 +303,10 @@ public class ChatFragment extends BaseFragment {
 
                             }
                         };
-                        query
-                                .limitToLast(20).addChildEventListener(listener);
+                        query = queryParent.limitToLast(limit);
+                        query.addChildEventListener(listener);
 
-                        query
-                                .limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
+                        query.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -330,6 +328,13 @@ public class ChatFragment extends BaseFragment {
                     }
                 });
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (listener != null)
+            query.removeEventListener(listener);
     }
 
     private int indexOf(List<Chat> chats, Chat chat) {

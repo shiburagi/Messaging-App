@@ -1,5 +1,6 @@
 package com.app.infideap.readcontact.controller.access.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatFragment;
@@ -56,9 +58,7 @@ public class ChatActivity extends BaseActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-        contact = (Contact) getIntent().getSerializableExtra(CONTACT);
-
+//        contact = (Contact) getIntent().getSerializableExtra(CONTACT);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -69,35 +69,7 @@ public class ChatActivity extends BaseActivity implements
         descToolbarTextView = (TextView) toolbar.findViewById(R.id.textView_toolbar_description);
 
         descToolbarTextView.setText(null);
-        if (contact == null)
-            finish();
-        else {
-            titleToolbarTextView.setText(contact.name);
-            if (contact.serial == null) {
-                ref.getPhoneNumber().getReference(contact.phoneNumber)
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-//                                Toast.makeText(ChatActivity.this,
-//                                        "serial : " + dataSnapshot.getValue() + ", " +
-//                                                contact.phoneNumber, Toast.LENGTH_SHORT).show();
-                                if (dataSnapshot.getValue() == null)
-                                    return;
-
-                                PhoneNumberIndex numberIndex = dataSnapshot.getValue(PhoneNumberIndex.class);
-                                contact.serial = numberIndex.serial;
-                                init();
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-            } else {
-                init();
-            }
-        }
+        loadData(getIntent());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +109,40 @@ public class ChatActivity extends BaseActivity implements
 
 
 
+    }
+
+    private void loadData(Intent intent) {
+        contact = (Contact) intent.getSerializableExtra(CONTACT);
+
+        if (contact == null)
+            finish();
+        else {
+            titleToolbarTextView.setText(contact.name);
+            if (contact.serial == null) {
+                ref.getPhoneNumber().getReference(contact.phoneNumber)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+//                                Toast.makeText(ChatActivity.this,
+//                                        "serial : " + dataSnapshot.getValue() + ", " +
+//                                                contact.phoneNumber, Toast.LENGTH_SHORT).show();
+                                if (dataSnapshot.getValue() == null)
+                                    return;
+
+                                PhoneNumberIndex numberIndex = dataSnapshot.getValue(PhoneNumberIndex.class);
+                                contact.serial = numberIndex.serial;
+                                init();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+            } else {
+                init();
+            }
+        }
     }
 
 
@@ -188,6 +194,17 @@ public class ChatActivity extends BaseActivity implements
 
     @Override
     public void onListFragmentInteraction(Chat chat) {
+
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        Toast.makeText(this, "onNewIntent() : "+contact.phoneNumber, Toast.LENGTH_LONG).show();
+
+        loadData(intent);
 
     }
 

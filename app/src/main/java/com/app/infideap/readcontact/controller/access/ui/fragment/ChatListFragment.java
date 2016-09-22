@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.adapter.ChatListRecyclerViewAdapter;
@@ -20,6 +21,7 @@ import com.app.infideap.readcontact.util.Constant;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -40,6 +42,8 @@ public class ChatListFragment extends BaseFragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
 
     private OnListFragmentInteractionListener mListener;
+    private TextView textView;
+    private RecyclerView recyclerView;
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
@@ -70,29 +74,44 @@ public class ChatListFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chatlist_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_chatlist_list, container, false);
 
+        textView = (TextView) rootView.findViewById(R.id.textView_no_result);
         // Set the adapter
+        View view = rootView.findViewById(R.id.list);
         if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            Context context = rootView.getContext();
+            recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             List<Contact> contacts = new ArrayList<>();
+            refresh(contacts);
             recyclerView.setAdapter(new ChatListRecyclerViewAdapter(contacts, mListener));
 
             loadData(contacts, recyclerView);
         }
-        return view;
+
+        return rootView;
+    }
+
+    private void refresh(List<Contact> contacts) {
+        if (contacts.size() > 0) {
+            recyclerView.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.GONE);
+            textView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void loadData(final List<Contact> contacts, final RecyclerView recyclerView) {
         final String serial = Common.getSimSerialNumber(getContext());
-        ref.getUser().message(serial)
-                .orderByChild(Constant.LAST_UPDATED)
+        Query query = ref.getUser().message(serial)
+                .orderByChild(Constant.LAST_UPDATED);
+        query
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -176,12 +195,12 @@ public class ChatListFragment extends BaseFragment {
         if (index != i) {
             contacts.remove(contact);
             contacts.add(i, contact);
-
             recyclerView.getAdapter().notifyItemMoved(index, i);
         } else if (index > -1) {
             recyclerView.getAdapter()
                     .notifyItemChanged(index);
         }
+
 
     }
 
@@ -204,7 +223,7 @@ public class ChatListFragment extends BaseFragment {
                                     return;
 
                                 UserInformation userInformation = dataSnapshot.getValue(UserInformation.class);
-                                Contact contact = Common.contactDetail(getContext(), userInformation.shortPhoneNumber);
+                                Contact contact = Common.contactDetail(recyclerView.getContext(), userInformation.shortPhoneNumber);
                                 if (contact == null) {
                                     contact = new Contact();
                                     contact.name = userInformation.phoneNumber;
@@ -218,6 +237,7 @@ public class ChatListFragment extends BaseFragment {
                                 getUnreadMessage(key, contact, contacts, recyclerView);
 
                                 contacts.add(0, contact);
+                                refresh(contacts);
                                 recyclerView.getAdapter().notifyItemInserted(0);
 
                             }
@@ -237,7 +257,7 @@ public class ChatListFragment extends BaseFragment {
 //        ref.getChat().message(key)
 //                .orderByChild(Constant.STATUS)
 //                .endAt(2)
-        ref.getUser().notification(Common.getSimSerialNumber(getContext()))
+        ref.getUser().notification(Common.getSimSerialNumber(recyclerView.getContext()))
                 .child(Constant.ITEMS)
                 .orderByChild(Constant.CHATKEY)
                 .equalTo(key)

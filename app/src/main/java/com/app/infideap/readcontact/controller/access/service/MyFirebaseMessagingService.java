@@ -92,7 +92,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             query.removeEventListener(listener);
 
         displayNotification(remoteMessage);
-//        pushNotification(remoteMessage);
+
+        if (remoteMessage.getNotification() != null)
+            pushNotification(remoteMessage);
 
 
         // Also if you intend on generating your own notifications as a result of a received FCM
