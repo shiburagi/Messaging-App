@@ -292,7 +292,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     .setContentIntent(pendingIntent);
             notificationBuilder.setContentText(contentText);
             if (datas.size() > 1)
-                notificationBuilder.addAction(0, contentText, pendingIntent);
+                inboxStyle.setSummaryText(contentText);
+
+//                notificationBuilder.addAction(0, contentText, pendingIntent);
 
 
         } else {
@@ -313,11 +315,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                     PendingIntent.FLAG_ONE_SHOT);
 
+            inboxStyle.setSummaryText(contentText);
             notificationBuilder.setContentTitle(getResources().getString(R.string.app_name))
                     .setContentText("Notification from Lanes" + datas.size())
                     .setContentIntent(pendingIntent);
             notificationBuilder.setContentText(contentText);
-            notificationBuilder.addAction(0, contentText, pendingIntent);
+//            notificationBuilder.addAction(0, contentText, pendingIntent);
 
 
         }
