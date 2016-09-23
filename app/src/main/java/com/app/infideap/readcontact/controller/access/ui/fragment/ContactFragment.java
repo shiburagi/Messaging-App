@@ -111,36 +111,44 @@ public class ContactFragment extends BaseFragment {
         }
     }
 
-    private void readContact(String phoneNumber, List<Contact> contacts, RecyclerView recyclerView) {
+    private void readContact(final String phoneNumber, final List<Contact> contacts, final RecyclerView recyclerView) {
         // Code to read contact
         // Begin
-        Cursor phones = null;
-        //handler for Android M and above
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
-                == PackageManager.PERMISSION_GRANTED) {
-            phones = getContext().getContentResolver()
-                    .query(ContactsQuery.CONTENT_URI, ContactsQuery.PROJECTION,
-                            ContactsQuery.SELECTION, null, ContactsQuery.SORT_ORDER);
-        }
-        if (phones != null) {
-            while (phones.moveToNext()) {
+
+        new Thread() {
+            public void run() {
+                Cursor phones = null;
+                //handler for Android M and above
+                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    phones = getContext().getContentResolver()
+                            .query(ContactsQuery.CONTENT_URI, ContactsQuery.PROJECTION,
+                                    ContactsQuery.SELECTION, null, ContactsQuery.SORT_ORDER);
+                }
+
+                if (phones != null) {
+                    while (phones.moveToNext()) {
 
 
-                final Contact contact = getContactDetail(phones);
+                        final Contact contact = getContactDetail(phones);
 
 
-                if (contact != null) {
-                    if (contact.phoneNumber.length() == 0)
-                        continue;
-                    contact.display = true;
+                        if (contact != null) {
+                            if (contact.phoneNumber.length() == 0)
+                                continue;
+                            contact.display = true;
 
 
-                    checkPhoneNumber(phoneNumber, contacts, contact, recyclerView);
+                            checkPhoneNumber(phoneNumber, contacts, contact, recyclerView);
+                        }
+
+                    }
+                    phones.close();
+
                 }
 
             }
-            phones.close();
-        }
+        }.start();
     }
 
     private void checkPhoneNumber(final String phoneNumber, final List<Contact> contacts, final Contact contact, final RecyclerView recyclerView) {

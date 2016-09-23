@@ -6,8 +6,9 @@
         android:left="0px"
         android:right="0px"
         android:top="0px">
-        <shape android:shape="oval">
-            <solid android:color="@color/colorPrimary" />
+        <shape android:shape="rectangle">
+            <corners android:radius="100dp"/>
+            <solid android:color="@color/colorPrimary"  />
         </shape>
     </item>
 </layer-list>

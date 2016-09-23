@@ -78,22 +78,25 @@
 
                 <FrameLayout
                     android:id="@+id/layout_count"
-                    android:layout_width="22dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:layout_alignParentRight="true"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin">
                     <ImageView
+                        android:layout_alignBottom="@+id/count"
                         android:id="@+id/imageView_count"
                         android:src="@drawable/layerlist_circle_primary"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
                     <TextView
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
                         android:layout_gravity="center"
                         android:id="@+id/count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        android:text="2"
                         android:textAllCaps="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="#fff"

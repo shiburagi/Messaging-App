@@ -16,6 +16,7 @@ import com.app.infideap.readcontact.entity.Chat;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Common;
 import com.app.infideap.readcontact.util.Constant;
+import com.app.infideap.readcontact.util.References;
 import com.app.infideap.stylishwidget.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -54,6 +55,10 @@ public class ChatFragment extends BaseFragment {
     private Query queryParent;
     private ChildEventListener listener;
     private Query query;
+
+    private boolean isStart = false;
+    private ChildEventListener notificationListener;
+    private Query notificationQuery;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -102,19 +107,36 @@ public class ChatFragment extends BaseFragment {
             recyclerView.setAdapter(new ChatRecyclerViewAdapter(chats, mListener));
             loadData(chats, recyclerView);
 
-            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+//            recyclerView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+//                @Override
+//                public void onScrollChanged() {
+//                    Toast.makeText(getContext(), "ScrollY : " + recyclerView.getScrollY(), Toast.LENGTH_LONG).show();
+//                }
+//            });
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
 
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
-                    if (dy < 20 && chats.size() >= limit) {
-                        limit += 20;
-//                        Toast.makeText(getContext(), dy + "," + limit, Toast.LENGTH_LONG).show();
-                        query.removeEventListener(listener);
+                    int y = recyclerView.computeVerticalScrollOffset();
 
-                        query = queryParent.limitToLast(limit);
-                        query.addChildEventListener(listener);
-                    }
+                    android.util.Log.d(TAG, y + "," + recyclerView.computeVerticalScrollOffset() + ", " + recyclerView.computeVerticalScrollExtent() + ", " + recyclerView.getScrollY() + ", " + limit);
+
+                    if (dy < 0)
+                        if (y > 0 && y <= 20 && chats.size() >= limit) {
+//                            Toast.makeText(getContext(), recyclerView.computeVerticalScrollRange() + "," + recyclerView.computeVerticalScrollOffset() + ", "
+//                                    + recyclerView.computeVerticalScrollExtent(), Toast.LENGTH_LONG).show();
+                            limit += 10;
+//                            Toast.makeText(getContext(), y + "," + limit, Toast.LENGTH_LONG).show();
+                            query.removeEventListener(listener);
+
+                            query = queryParent.limitToLast(limit);
+                            query.addChildEventListener(listener);
+                        }
                 }
             });
 
@@ -152,9 +174,50 @@ public class ChatFragment extends BaseFragment {
         return view;
     }
 
+    private void clearNotification(String key) {
+//        Toast.makeText(getContext(), "key : " + key, Toast.LENGTH_SHORT).show();
+        notificationListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                Toast.makeText(getContext(), "data key : " + dataSnapshot.getRef().getKey(), Toast.LENGTH_SHORT).show();
+
+                dataSnapshot.getRef().setValue(null);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        notificationQuery = ref.getUser().notification(Common.getSimSerialNumber(getContext()))
+                .child(Constant.ITEMS)
+                .orderByChild(Constant.CHATKEY)
+                .equalTo(key);
+        notificationQuery
+                .addChildEventListener(notificationListener);
+
+    }
+
     @Override
     public void onStart() {
         super.onStart();
+
+        isStart = true;
     }
 
     private void loadData(final List<Chat> chats, final RecyclerView recyclerView) {
@@ -177,6 +240,8 @@ public class ChatFragment extends BaseFragment {
                             return;
 
                         final String key = Common.convertToChatKey(phoneNumber, contact.phoneNumber);
+                        clearNotification(key);
+
                         queryParent = ref.getChat()
                                 .message(key)
                                 .orderByChild(Constant.DATETIME);
@@ -248,6 +313,13 @@ public class ChatFragment extends BaseFragment {
                                 }
 
 
+                                if (chat.type == 1 && chat.status != Constant.MESSAGE_READ) {
+                                    References.getInstance().getChat().message(chat.chatKey)
+                                            .child(chat.key)
+                                            .child(Constant.STATUS)
+                                            .setValue(Constant.MESSAGE_READ);
+                                }
+
                                 if (phoneNumber.equals(chat.from))
                                     recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
                                 if (isMaxScrollReached(recyclerView))
@@ -265,6 +337,13 @@ public class ChatFragment extends BaseFragment {
                                     return;
 
                                 chat.status = _Chat.status;
+
+                                if (chat.type == 1 && chat.status != Constant.MESSAGE_READ) {
+                                    References.getInstance().getChat().message(chat.chatKey)
+                                            .child(chat.key)
+                                            .child(Constant.STATUS)
+                                            .setValue(Constant.MESSAGE_READ);
+                                }
 
                                 int index = chats.indexOf(chat);
                                 if (index >= 0)
@@ -284,11 +363,11 @@ public class ChatFragment extends BaseFragment {
                                 if (index >= 0) {
                                     recyclerView.getAdapter()
                                             .notifyItemRemoved(index);
-
-                                    if (chats.get(index - 1).type == 2 && chats.get(index).type == 2) {
-                                        chats.remove(index - 1);
-                                        recyclerView.getAdapter().notifyItemRemoved(index - 1);
-                                    }
+                                    if (index > 0 && index < chats.size())
+                                        if (chats.get(index - 1).type == 2 && chats.get(index).type == 2) {
+                                            chats.remove(index - 1);
+                                            recyclerView.getAdapter().notifyItemRemoved(index - 1);
+                                        }
                                 }
 
                             }
@@ -327,14 +406,17 @@ public class ChatFragment extends BaseFragment {
 
                     }
                 });
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (listener != null)
+        if (listener != null) {
             query.removeEventListener(listener);
+        }
+        if (notificationListener != null)
+            notificationQuery.removeEventListener(notificationListener);
+
     }
 
     private int indexOf(List<Chat> chats, Chat chat) {

@@ -149,6 +149,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         final DatabaseReference reference = references.getChat().message(
                 data.chatKey
         ).child(data.key).child(Constant.STATUS);
+
         reference
                 .setValue(Constant.MESSAGE_RECEIVE)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

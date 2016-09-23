@@ -123,12 +123,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         holder.statusView.setImageResource(resId);
 
-        if (holder.mItem.type == 1 && holder.mItem.status != Constant.MESSAGE_READ) {
-            References.getInstance().getChat().message(holder.mItem.chatKey)
-                    .child(holder.mItem.key)
-                    .child(Constant.STATUS)
-                    .setValue(Constant.MESSAGE_READ);
-        }
+
 
     }
 

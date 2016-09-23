@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * A fragment representing a list of Items.
@@ -44,6 +45,8 @@ public class ChatListFragment extends BaseFragment {
     private OnListFragmentInteractionListener mListener;
     private TextView textView;
     private RecyclerView recyclerView;
+
+    private TreeSet<String> strings = new TreeSet<>();
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
@@ -90,6 +93,7 @@ public class ChatListFragment extends BaseFragment {
             List<Contact> contacts = new ArrayList<>();
             refresh(contacts);
             recyclerView.setAdapter(new ChatListRecyclerViewAdapter(contacts, mListener));
+
 
             loadData(contacts, recyclerView);
         }
@@ -265,13 +269,15 @@ public class ChatListFragment extends BaseFragment {
 
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        contact.unreadCount++;
+                        contact.unreadCount+=1;
                         int index = contacts.indexOf(contact);
                         if (index > -1)
                             recyclerView.getAdapter().notifyItemChanged(index);
                         else {
                             recyclerView.getAdapter().notifyItemChanged(0, recyclerView.getChildCount());
                         }
+                        strings.add(contact.phoneNumber);
+                        mListener.onNumberOfUnreadChatChanged(strings.size());
                     }
 
                     @Override
@@ -301,6 +307,10 @@ public class ChatListFragment extends BaseFragment {
                                 recyclerView.getAdapter().notifyItemChanged(index);
                             else {
                                 recyclerView.getAdapter().notifyItemChanged(0, recyclerView.getChildCount());
+                            }
+                            if (contact.unreadCount < 1) {
+                                strings.remove(contact.phoneNumber);
+                                mListener.onNumberOfUnreadChatChanged(strings.size());
                             }
                         }
                     }
@@ -348,5 +358,7 @@ public class ChatListFragment extends BaseFragment {
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Contact item);
+
+        void onNumberOfUnreadChatChanged(int size);
     }
 }

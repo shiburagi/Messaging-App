@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.app.infideap.readcontact.R;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatListFragment;
@@ -153,8 +155,21 @@ public class MainActivity extends BaseActivity implements
                 tabLayout.newTab().setText(R.string.contact)
         };
 
-        for (TabLayout.Tab tab : tabs)
+        for (TabLayout.Tab tab : tabs) {
+            View customView = getLayoutInflater().inflate(R.layout.tablayout_tab_view, tabLayout, false);
+            TextView titleTextView = (TextView) customView.findViewById(R.id.textView_title);
+            TextView countTextView = (TextView) customView.findViewById(R.id.textView_count);
+            ImageView countImageView = (ImageView) customView.findViewById(R.id.imageView_count);
+            View countLayout = customView.findViewById(R.id.layout_count);
+            countLayout.setVisibility(View.GONE);
+            countImageView.setColorFilter(android.support.v4.content.ContextCompat.getColor(this, R.color.colorWhite));
+
+            customView.setAlpha(0.7f);
+
+            titleTextView.setText(tab.getText());
+            tab.setCustomView(customView);
             tabLayout.addTab(tab);
+        }
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -162,17 +177,21 @@ public class MainActivity extends BaseActivity implements
                 toolbar.setTitle(tab.getText());
                 viewPager.setCurrentItem(tab.getPosition());
                 hideSearch();
+
+                tab.getCustomView().setAlpha(1);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
+                tab.getCustomView().setAlpha(0.7f);
             }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
                 Log.d(TAG, "onTabReselected()");
                 toolbar.setTitle(tab.getText());
+                tab.getCustomView().setAlpha(1);
+
             }
         });
 
@@ -182,8 +201,6 @@ public class MainActivity extends BaseActivity implements
     private void hideSearch() {
 //        searchToolBar.setVisibility(View.GONE);
 //        appBar.setExpanded(true);
-
-
 
 
         // get the center for the clipping circle
@@ -316,6 +333,27 @@ public class MainActivity extends BaseActivity implements
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra(ChatActivity.CONTACT, item);
         startActivity(intent);
+    }
+
+    @Override
+    public void onNumberOfUnreadChatChanged(int size) {
+        TabLayout.Tab tab = tabLayout.getTabAt(0);
+
+        View customView = tab.getCustomView();
+
+        if (customView == null) {
+            return;
+        }
+        TextView countTextView = (TextView) customView.findViewById(R.id.textView_count);
+        View countLayout = customView.findViewById(R.id.layout_count);
+        countLayout.setVisibility(View.GONE);
+
+        if (size > 0) {
+            countLayout.setVisibility(View.VISIBLE);
+            countTextView.setText(String.valueOf(size));
+        } else
+            countLayout.setVisibility(View.GONE);
+
     }
 
     @Override
