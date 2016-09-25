@@ -15,9 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -73,20 +71,10 @@ public class MainActivity extends BaseActivity implements
                 }
             });
         }
+
+
         initTabLayout();
         initViewPager();
-
-//        appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-//            @Override
-//            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-//                if(verticalOffset >= appBarLayout.getHeight()){
-//                    appBarLayout.setExpanded(true);
-//                }else
-//                    appBarLayout.setExpanded(false);
-//            }
-//        });
-
-//        MyFirebaseMessagingService.inboxStyle = null;
 
     }
 
@@ -214,49 +202,47 @@ public class MainActivity extends BaseActivity implements
         float finalRadius = (float) Math.hypot(dx, dy);
 
         Animator animator;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            animator = ViewAnimationUtils
-                    .createCircularReveal(searchAppBar, cx, cy, finalRadius, 0);
-            animator.setInterpolator(new AccelerateDecelerateInterpolator());
-            animator.setDuration(200);
-            animator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
-                }
+        animator = io.codetail.animation.ViewAnimationUtils
+                .createCircularReveal(searchAppBar, cx, cy, finalRadius, 0);
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.setDuration(200);
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+            }
 
-                @Override
-                public void onAnimationEnd(Animator animator) {
-//                    searchToolBar.setAlpha(0);
-                    toolbar.setAlpha(1f);
-                    searchAppBar.setVisibility(View.GONE);
-                    appBar.setVisibility(View.VISIBLE);
-
-                    AnimatorSet set = new AnimatorSet();
-                    set.playTogether(
-                            ObjectAnimator.ofFloat(appBar, "translationY", 0),
-                            ObjectAnimator.ofFloat(appBar, "alpha", 1),
-                            ObjectAnimator.ofFloat(viewPager, "translationY", 0)
-                    );
-                    set.setDuration(100).start();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
-
-            animator.start();
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                toolbar.setAlpha(1f);
+                searchAppBar.setVisibility(View.GONE);
 
 
-        } else {
-            searchAppBar.setVisibility(View.GONE);
-        }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+
+        animator.start();
+
+
+        appBar.setVisibility(View.VISIBLE);
+
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(
+                ObjectAnimator.ofFloat(appBar, "translationY", 0),
+                ObjectAnimator.ofFloat(appBar, "alpha", 1),
+                ObjectAnimator.ofFloat(viewPager, "translationY", 0)
+        );
+        set.setDuration(100).start();
+
     }
 
     @Override
@@ -276,8 +262,6 @@ public class MainActivity extends BaseActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
 
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
             toolbar.setAlpha(0);
 
             AnimatorSet set = new AnimatorSet();
@@ -286,7 +270,28 @@ public class MainActivity extends BaseActivity implements
                     ObjectAnimator.ofFloat(viewPager, "translationY", -tabLayout.getHeight()),
                     ObjectAnimator.ofFloat(appBar, "alpha", 0)
             );
-            set.setDuration(100).start();
+            set.setDuration(100).addListener(new com.nineoldandroids.animation.Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(com.nineoldandroids.animation.Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(com.nineoldandroids.animation.Animator animation) {
+                    appBar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationCancel(com.nineoldandroids.animation.Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(com.nineoldandroids.animation.Animator animation) {
+
+                }
+            });
+            set.start();
 
 
             // get the center for the clipping circle
@@ -313,15 +318,16 @@ public class MainActivity extends BaseActivity implements
 //            }
 
 
-            toolbar.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    searchAppBar.setVisibility(View.VISIBLE);
-                    appBar.setVisibility(View.GONE);
-                    if (animator != null)
-                        animator.start();
-                }
-            }, 100);
+//            toolbar.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+////                    if (animator != null)
+//                }
+//            }, 100);
+
+            searchAppBar.setVisibility(View.VISIBLE);
+            animator.start();
+
             return true;
         }
 
@@ -355,7 +361,6 @@ public class MainActivity extends BaseActivity implements
             countLayout.setVisibility(View.GONE);
 
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constant.PERMISSION_REQUEST && resultCode == RESULT_OK)

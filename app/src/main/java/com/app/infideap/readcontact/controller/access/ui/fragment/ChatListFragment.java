@@ -96,6 +96,7 @@ public class ChatListFragment extends BaseFragment {
 
 
             loadData(contacts, recyclerView);
+
         }
 
         return rootView;
@@ -269,7 +270,7 @@ public class ChatListFragment extends BaseFragment {
 
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        contact.unreadCount+=1;
+                        contact.unreadCount += 1;
                         int index = contacts.indexOf(contact);
                         if (index > -1)
                             recyclerView.getAdapter().notifyItemChanged(index);
@@ -282,18 +283,6 @@ public class ChatListFragment extends BaseFragment {
 
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                        Chat chat = dataSnapshot.getValue(Chat.class);
-//                        if (chat != null)
-//                            if (chat.status == Constant.MESSAGE_READ) {
-//                                contact.unreadCount--;
-//
-//                                int index = contacts.indexOf(contact);
-//                                if (index > -1)
-//                                    recyclerView.getAdapter().notifyItemChanged(index);
-//                                else{
-//                                    recyclerView.getAdapter().notifyItemChanged(0,recyclerView.getChildCount());
-//                                }
-//                            }
                     }
 
                     @Override
@@ -360,5 +349,6 @@ public class ChatListFragment extends BaseFragment {
         void onListFragmentInteraction(Contact item);
 
         void onNumberOfUnreadChatChanged(int size);
+
     }
 }
