@@ -40,6 +40,7 @@ public class MainActivity extends BaseActivity implements
     private Toolbar toolbar;
     private AppBarLayout appBar;
     private AppBarLayout searchAppBar;
+    private View searchAppBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,8 @@ public class MainActivity extends BaseActivity implements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         appBar = (AppBarLayout) findViewById(R.id.appBar);
         searchAppBar = (AppBarLayout) findViewById(R.id.appBar_search);
+        searchAppBarLayout = findViewById(R.id.layout_appbar_search);
+
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -63,7 +66,7 @@ public class MainActivity extends BaseActivity implements
         if (searchToolBar != null) {
             searchToolBar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
 //            searchToolBar.setVisibility(View.GONE);
-            searchAppBar.setVisibility(View.GONE);
+            searchAppBarLayout.setVisibility(View.GONE);
             searchToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -101,7 +104,7 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onBackPressed() {
-        if (searchAppBar.getVisibility() == View.VISIBLE)
+        if (searchAppBarLayout.getVisibility() == View.VISIBLE)
             hideSearch();
         else
             super.onBackPressed();
@@ -203,7 +206,7 @@ public class MainActivity extends BaseActivity implements
 
         Animator animator;
         animator = io.codetail.animation.ViewAnimationUtils
-                .createCircularReveal(searchAppBar, cx, cy, finalRadius, 0);
+                .createCircularReveal(searchAppBarLayout, cx, cy, finalRadius, 0);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.setDuration(200);
         animator.addListener(new Animator.AnimatorListener() {
@@ -214,7 +217,7 @@ public class MainActivity extends BaseActivity implements
             @Override
             public void onAnimationEnd(Animator animator) {
                 toolbar.setAlpha(1f);
-                searchAppBar.setVisibility(View.GONE);
+                searchAppBarLayout.setVisibility(View.GONE);
 
 
             }
@@ -307,13 +310,13 @@ public class MainActivity extends BaseActivity implements
             final Animator animator;
 //            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             animator = io.codetail.animation.ViewAnimationUtils
-                    .createCircularReveal(searchAppBar, cx, cy, 0, finalRadius);
+                    .createCircularReveal(searchAppBarLayout, cx, cy, 0, finalRadius);
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.setDuration(200);
 //                animator.start();
 
 //            } else {
-////                searchAppBar.setVisibility(View.VISIBLE);
+////                searchAppBarLayout.setVisibility(View.VISIBLE);
 //                animator = null;
 //            }
 
@@ -325,7 +328,7 @@ public class MainActivity extends BaseActivity implements
 //                }
 //            }, 100);
 
-            searchAppBar.setVisibility(View.VISIBLE);
+            searchAppBarLayout.setVisibility(View.VISIBLE);
             animator.start();
 
             return true;
@@ -361,6 +364,7 @@ public class MainActivity extends BaseActivity implements
             countLayout.setVisibility(View.GONE);
 
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constant.PERMISSION_REQUEST && resultCode == RESULT_OK)

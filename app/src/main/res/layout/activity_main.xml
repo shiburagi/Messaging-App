@@ -7,43 +7,47 @@
     android:fitsSystemWindows="true"
     tools:context=".controller.access.ui.activity.MainActivity">
 
-    <include
-        layout="@layout/app_bar_main"/>
+    <include layout="@layout/app_bar_main" />
 
     <io.codetail.widget.RevealFrameLayout
-        android:id="@+id/layout_appbar_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appBar_search"
+        <LinearLayout
+            android:id="@+id/layout_appbar_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="-12dp"
-            android:layout_marginRight="-12dp"
-            android:layout_marginTop="-12dp"
-            android:background="@android:drawable/dialog_holo_light_frame"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_search"
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/appBar_search"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="#fff"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
+                android:layout_height="wrap_content"
+                android:theme="@style/AppTheme.AppBarOverlay">
 
-                <EditText
-                    android:background="@null"
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar_search"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/searchwithdot"
-                    android:textColorHint="#666" />
-            </android.support.v7.widget.Toolbar>
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="#fff"
+                    app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="@string/searchwithdot"
+                        android:textColorHint="#666" />
+                </android.support.v7.widget.Toolbar>
 
 
-        </android.support.design.widget.AppBarLayout>
+            </android.support.design.widget.AppBarLayout>
 
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="@drawable/dropshadow" />
+        </LinearLayout>
     </io.codetail.widget.RevealFrameLayout>
 </android.support.design.widget.CoordinatorLayout>
