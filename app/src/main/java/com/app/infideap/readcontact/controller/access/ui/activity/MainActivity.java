@@ -11,21 +11,28 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.infideap.readcontact.R;
+import com.app.infideap.readcontact.controller.access.ui.fragment.BaseFragment;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ChatListFragment;
 import com.app.infideap.readcontact.controller.access.ui.fragment.ContactFragment;
 import com.app.infideap.readcontact.entity.Contact;
 import com.app.infideap.readcontact.util.Constant;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity implements
         ContactFragment.OnListFragmentInteractionListener,
@@ -35,7 +42,7 @@ public class MainActivity extends BaseActivity implements
     public static boolean isRunnning;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private Fragment fragment;
+    private BaseFragment fragment;
     private Toolbar searchToolBar;
     private Toolbar toolbar;
     private AppBarLayout appBar;
@@ -71,6 +78,23 @@ public class MainActivity extends BaseActivity implements
                 @Override
                 public void onClick(View view) {
                     hideSearch();
+                }
+            });
+
+            EditText editText = (EditText) findViewById(R.id.editText_search);
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    fragment.search(charSequence.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
                 }
             });
         }
@@ -111,23 +135,20 @@ public class MainActivity extends BaseActivity implements
 
     }
 
+    List<BaseFragment> fragments = new ArrayList<>();
+
     private void initViewPager() {
+        fragments.add(ChatListFragment.newInstance(1));
+        fragments.add(ContactFragment.newInstance(1));
+
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                switch (position) {
-                    case 0:
-                        fragment = ChatListFragment.newInstance(1);
-                        break;
-                    case 1:
-                        fragment = ContactFragment.newInstance(1);
-                        break;
-                    default:
-                        fragment = new Fragment();
-                        break;
-                }
-                return fragment;
+                if (position < fragments.size())
+                    return fragments.get(position);
+                else
+                    return new BaseFragment();
             }
 
             @Override
@@ -169,6 +190,7 @@ public class MainActivity extends BaseActivity implements
                 viewPager.setCurrentItem(tab.getPosition());
                 hideSearch();
 
+                fragment = fragments.get(tab.getPosition());
                 tab.getCustomView().setAlpha(1);
             }
 
@@ -182,6 +204,7 @@ public class MainActivity extends BaseActivity implements
                 Log.d(TAG, "onTabReselected()");
                 toolbar.setTitle(tab.getText());
                 tab.getCustomView().setAlpha(1);
+                fragment = fragments.get(tab.getPosition());
 
             }
         });

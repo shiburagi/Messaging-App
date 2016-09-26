@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeSet;
 
 /**
@@ -47,6 +48,8 @@ public class ChatListFragment extends BaseFragment {
     private RecyclerView recyclerView;
 
     private TreeSet<String> strings = new TreeSet<>();
+    private List<Contact> contacts;
+    private List<Contact> filterContacts;
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
@@ -90,19 +93,19 @@ public class ChatListFragment extends BaseFragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            List<Contact> contacts = new ArrayList<>();
-            refresh(contacts);
+            contacts = new ArrayList<>();
+            refresh();
             recyclerView.setAdapter(new ChatListRecyclerViewAdapter(contacts, mListener));
 
 
-            loadData(contacts, recyclerView);
+            loadData(recyclerView);
 
         }
 
         return rootView;
     }
 
-    private void refresh(List<Contact> contacts) {
+    private void refresh() {
         if (contacts.size() > 0) {
             recyclerView.setVisibility(View.VISIBLE);
             textView.setVisibility(View.GONE);
@@ -112,7 +115,7 @@ public class ChatListFragment extends BaseFragment {
         }
     }
 
-    private void loadData(final List<Contact> contacts, final RecyclerView recyclerView) {
+    private void loadData(final RecyclerView recyclerView) {
         final String serial = Common.getSimSerialNumber(getContext());
         Query query = ref.getUser().message(serial)
                 .orderByChild(Constant.LAST_UPDATED);
@@ -242,7 +245,7 @@ public class ChatListFragment extends BaseFragment {
                                 getUnreadMessage(key, contact, contacts, recyclerView);
 
                                 contacts.add(0, contact);
-                                refresh(contacts);
+                                refresh();
                                 recyclerView.getAdapter().notifyItemInserted(0);
 
                             }
@@ -316,6 +319,27 @@ public class ChatListFragment extends BaseFragment {
                 });
     }
 
+    @Override
+    public void search(String text) {
+        super.search(text);
+
+        if(text.length()==0){
+            recyclerView.setAdapter(new ChatListRecyclerViewAdapter(contacts, mListener));
+            return;
+        }
+        filterContacts = new ArrayList<>();
+        String regex = String.format(
+                Locale.getDefault(),
+                "(%s).*",
+                text
+        );
+        for (Contact contact : this.contacts) {
+            if (contact.name.matches(regex))
+                contacts.add(contact);
+        }
+        recyclerView.setAdapter(new ChatListRecyclerViewAdapter(filterContacts, mListener));
+
+    }
 
     @Override
     public void onAttach(Context context) {
